@@ -58,9 +58,8 @@ def show_env() -> None:
     typer.echo(json.dumps(data, indent=2))
 
 
-@cli.group()
-def recorder() -> None:
-    """Manage HLS recording buffer."""
+recorder = typer.Typer(help="Manage HLS recording buffer.")
+cli.add_typer(recorder, name="recorder")
 
 
 @recorder.command("start")
@@ -86,9 +85,8 @@ def recorder_start(stream_url: Optional[str] = typer.Option(None, help="HLS stre
         sb.stop()
 
 
-@cli.group()
-def ppv() -> None:
-    """PPV.to stream utilities."""
+ppv = typer.Typer(help="PPV.to stream utilities.")
+cli.add_typer(ppv, name="ppv")
 
 
 @ppv.command("list")
@@ -166,9 +164,8 @@ def ppv_record(uri_name: str = typer.Argument(..., help="uri_name from API")) ->
         sb.stop()
 
 
-@cli.group()
-def agent() -> None:
-    """Run monitoring and highlight detection agent."""
+agent = typer.Typer(help="Run monitoring and highlight detection agent.")
+cli.add_typer(agent, name="agent")
 
 
 def _upload_if_enabled(local_path: Path, metadata: dict) -> str:
@@ -256,24 +253,53 @@ def agent_run(league: Optional[str] = typer.Option(None, help="nba|nfl or omit f
             break
 
 
-@cli.group()
-def server() -> None:
-    """Run API/dashboard server."""
+server = typer.Typer(help="Run API/dashboard server.")
+cli.add_typer(server, name="server")
 
 
 @server.command("run")
-def server_run(host: Optional[str] = None, port: Optional[int] = None) -> None:
+def server_run(
+    host: Optional[str] = None,
+    port: Optional[int] = None,
+    demo: bool = typer.Option(False, "--demo", help="Replay scripted plays with synthetic clips (no live games needed)"),
+) -> None:
     load_dotenv()
     configure_logging()
     _ensure_dirs()
+    if demo:
+        settings.demo_mode = True
+        if not any(settings.demo_clips_dir.glob("*.mp4")):
+            from bigplays.demo.clip_gen import render_all
+
+            typer.echo("No demo clips found; rendering synthetic clips...")
+            render_all(settings.demo_clips_dir)
     h = host or settings.server_host
     p = port or settings.server_port
-    uvicorn.run(fastapi_app, host=h, port=p, reload=False)
+    # short graceful-shutdown window so open SSE streams don't keep a dying server alive
+    uvicorn.run(fastapi_app, host=h, port=p, reload=False, timeout_graceful_shutdown=2)
 
 
-@cli.group()
-def assemble() -> None:
-    """Assemble reels from existing clips."""
+demo = typer.Typer(help="Demo utilities: synthetic clips and scripted live replay.")
+cli.add_typer(demo, name="demo")
+
+
+@demo.command("clips")
+def demo_clips(force: bool = typer.Option(False, "--force", help="Re-render even if clips exist")) -> None:
+    """Render synthetic highlight clips for every scripted demo play."""
+    from bigplays.demo.clip_gen import render_all
+
+    outs = render_all(settings.demo_clips_dir, force=force)
+    typer.echo(f"{len(outs)} demo clips in {settings.demo_clips_dir}")
+
+
+@demo.command("run")
+def demo_run(host: Optional[str] = None, port: Optional[int] = None) -> None:
+    """Start the server in demo mode (same as `server run --demo`)."""
+    server_run(host=host, port=port, demo=True)
+
+
+assemble = typer.Typer(help="Assemble reels from existing clips.")
+cli.add_typer(assemble, name="assemble")
 
 
 @assemble.command("reels")

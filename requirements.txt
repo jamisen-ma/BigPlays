@@ -19,3 +19,5 @@ pytest>=8.2.0
 orjson>=3.10.6
 beautifulsoup4>=4.12.3
 
+pillow>=10.0.0
+imageio-ffmpeg>=0.5.1

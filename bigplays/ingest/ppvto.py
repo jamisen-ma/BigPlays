@@ -91,8 +91,7 @@ def extract_hls_from_html(html: str) -> Optional[str]:
             if isinstance(val, str) and ".m3u8" in val:
                 return val
     # Fallback: regex search
-    m = re.search(r"https?://[^\'\"\s>]+\.m3u8[^
-\'\"\s<]*", html)
+    m = re.search(r"https?://[^'\"\s>]+\.m3u8[^'\"\s<]*", html)
     if m:
         return m.group(0)
     return None

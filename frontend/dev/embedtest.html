@@ -1,0 +1,33 @@
+<!doctype html><meta charset="utf-8"><title>embed test</title>
+<style>body{font:12px monospace;background:#111;color:#ddd;padding:12px} td{padding:2px 8px} .ok{color:#6f6} .bad{color:#f66} #stage{width:320px;height:180px}</style>
+<div id="stage"></div>
+<table id="t"></table>
+<script>
+const CANDS = [
+ ["obj_a","818_M8gOnqQ"],["obj_b","jkKidwOKNwA"],["obj_c","2-nxVRU9MaY"],["obj_d","SznmRinRinI"],["obj_e","y8ufdXjRvtA"],
+ ["obj_f","pbHxlETOJWY"],["obj_g","mc4u0dVR0n4"],["obj_h","E7QrGJRcF7M"],["obj_i","N-_uF1nmukw"],["obj_j","gufXYBESSis"],
+ ["philly_a","Ctm6cFhaZjU"],["philly_b","nlHa4pO--vk"],["philly_c","XHZN__oD-3M"],["philly_d","1kZPou5lSQ4"],["philly_e","DZ2H6cfGAIw"],
+ ["philly_f","3rfUnh4Xkgo"],["philly_g","EYMvenTV-Kw"],["philly_h","pGcSWCfnRNw"],
+];
+const t = document.getElementById('t');
+const results = {};
+function row(k, id, status, cls){ const tr=document.createElement('tr'); tr.innerHTML=`<td>${k}</td><td>${id}</td><td class="${cls}">${status}</td>`; t.appendChild(tr); results[k]={id,status}; }
+let i=0, player=null, timer=null;
+function next(){
+  if (player) { try{player.destroy()}catch(e){} player=null; }
+  if (i>=CANDS.length){ row('DONE','','done','ok'); window.__done=true; return; }
+  const [k,id]=CANDS[i++];
+  const el=document.createElement('div'); document.getElementById('stage').appendChild(el);
+  let settled=false;
+  const finish=(status,cls)=>{ if(settled) return; settled=true; clearTimeout(timer); row(k,id,status,cls); setTimeout(next,300); };
+  timer=setTimeout(()=>finish('timeout','bad'),9000);
+  player=new YT.Player(el,{videoId:id,width:320,height:180,host:'https://www.youtube-nocookie.com',playerVars:{autoplay:1,mute:1,origin:location.origin},
+    events:{
+      onReady:e=>{ e.target.mute(); e.target.playVideo(); },
+      onStateChange:e=>{ if(e.data===YT.PlayerState.PLAYING||e.data===YT.PlayerState.BUFFERING) finish('PLAYS','ok'); },
+      onError:e=>finish('ERROR '+e.data,'bad'),
+    }});
+}
+window.onYouTubeIframeAPIReady=next;
+const s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+</script>
