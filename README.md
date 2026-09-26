@@ -20,7 +20,7 @@ basically: scoreboard + play-by-play + commentary + social signals go in -> Clau
 
 ## running it
 
-python 3.10+, ffmpeg on your PATH if you want real clipping (demo mode doesnt need it).
+python 3.10+. ffmpeg on your PATH is nice but not required, it falls back to the one bundled w/ imageio-ffmpeg (no ffprobe in that one though).
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
@@ -33,6 +33,10 @@ then in separate terminals:
 ```bash
 # records the broadcast into a rolling buffer
 python -m bigplays.main recorder start --stream-url "$STREAM_URL"
+# no stream handy? --test uses a public test hls playlist so you can try the buffer + clipper
+python -m bigplays.main recorder start --test
+# cut the last 14s out of the buffer by hand (shows up in the dashboard feed)
+python -m bigplays.main recorder clip --last 14
 
 # the actual agent (ingest -> detect -> clip -> store)
 python -m bigplays.main agent run --league nba
@@ -96,7 +100,9 @@ everything is env vars, see `env.example`. the important ones:
 
 - espn's public endpoints arent official, they change whenever. fine for a project, get a real feed for anything serious
 - the scoreboard api doesnt give play by play so "events" are score deltas. the demo plays have the real descriptions baked in
-- clip timing depends on your system clock being right, use ntp
+- clip timing depends on your system clock being right, use ntp. segment files are named in utc
+- w/ `-c copy` ffmpeg can only split segments on keyframes, so if the source has 10s gops your buffer granularity is 10s not 2
+- for a real stream you need one you're allowed to record (ota antenna + hdhomerun works great for local nfl/nba games). not touching the pirate sites
 - autoplay is muted (browser rules), hit the speaker icon
 - dont expose the dashboard without putting auth in front of it
 

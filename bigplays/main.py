@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import os
 import time
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -62,16 +63,23 @@ recorder = typer.Typer(help="Manage HLS recording buffer.")
 cli.add_typer(recorder, name="recorder")
 
 
+TEST_STREAM_URL = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"  # public test HLS playlist (Big Buck Bunny)
+
+
 @recorder.command("start")
-def recorder_start(stream_url: Optional[str] = typer.Option(None, help="HLS stream URL")) -> None:
+def recorder_start(
+    stream_url: Optional[str] = typer.Option(None, help="HLS stream URL"),
+    realtime: bool = typer.Option(False, "--realtime", help="Read at native speed (-re). Needed for VOD/test playlists."),
+    test: bool = typer.Option(False, "--test", help="Use a public test HLS stream (implies --realtime)"),
+) -> None:
     load_dotenv()
     configure_logging()
     _ensure_dirs()
-    url = stream_url or settings.stream_url
+    url = TEST_STREAM_URL if test else (stream_url or settings.stream_url)
     if not url:
-        typer.echo("STREAM_URL required")
+        typer.echo("STREAM_URL required (or pass --test)")
         raise typer.Exit(code=2)
-    cfg = StreamBufferConfig(stream_url=url, buffer_dir=settings.buffer_dir)
+    cfg = StreamBufferConfig(stream_url=url, buffer_dir=settings.buffer_dir, realtime=realtime or test)
     sb = StreamBuffer(cfg)
     log = get_logger("recorder")
     log.info("starting_recorder", url=url, buffer=str(settings.buffer_dir))
@@ -83,6 +91,46 @@ def recorder_start(stream_url: Optional[str] = typer.Option(None, help="HLS stre
     except KeyboardInterrupt:
         log.info("stopping_recorder")
         sb.stop()
+
+
+@recorder.command("clip")
+def recorder_clip(
+    last: int = typer.Option(14, help="Seconds to cut, ending now (default pre-roll 8 + post-roll 6)"),
+    title: str = typer.Option("Manual clip from live buffer", help="Title written to the sidecar"),
+    out: Optional[Path] = typer.Option(None, help="Output mp4 (default data/clips/manual_<ts>.mp4)"),
+) -> None:
+    """Cut the last N seconds out of the rolling buffer into an mp4 + json sidecar (shows up in the dashboard)."""
+    load_dotenv()
+    configure_logging()
+    _ensure_dirs()
+    from bigplays.media.ffmpeg_utils import media_duration_seconds
+
+    now = datetime.now(timezone.utc)
+    start = now - timedelta(seconds=last)
+    out_path = out or settings.clips_dir / f"manual_{now.strftime('%Y%m%d-%H%M%S')}.mp4"
+    event_id = hashlib.sha1(f"manual-{now.isoformat()}".encode()).hexdigest()[:12]
+    metadata = {
+        "event_id": event_id,
+        "game_id": "buffer-test",
+        "league": "nba",
+        "occurred_utc": now.isoformat(),
+        "clip_start_utc": start.isoformat(),
+        "clip_end_utc": now.isoformat(),
+        "reasons": ["manual"],
+        "base_score": 1.0,
+        "combined_score": 1.0,
+        "tags": ["manual", "buffer-test"],
+        "title": title,
+        "description": f"Manual cut of the last {last}s from the rolling HLS buffer",
+        "storage_uri": None,
+    }
+    try:
+        clip_window(settings.buffer_dir / "segments", start, now, out_path, metadata)
+    except ValueError as ex:
+        typer.echo(f"no buffer segments in the last {last}s ({ex}). Is `recorder start` running?")
+        raise typer.Exit(1)
+    dur = media_duration_seconds(out_path)
+    typer.echo(f"wrote {out_path} ({dur:.1f}s)" if dur else f"wrote {out_path}")
 
 
 ppv = typer.Typer(help="PPV.to stream utilities.")

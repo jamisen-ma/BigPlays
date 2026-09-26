@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from bigplays.media.ffmpeg_utils import ensure_ffmpeg_installed
+from bigplays.media.ffmpeg_utils import ensure_ffmpeg_installed, ffmpeg_bin
 
 
 @dataclass
@@ -15,6 +15,7 @@ class StreamBufferConfig:
     buffer_dir: Path
     segment_seconds: int = 2
     max_hours: int = 6  # rolling retention
+    realtime: bool = False  # read the input at native rate (-re); use for VOD/test playlists so timestamps track wall clock
 
 
 class StreamBuffer:
@@ -27,7 +28,10 @@ class StreamBuffer:
     def start(self) -> None:
         ensure_ffmpeg_installed()
         out_pattern = str(self.segments_dir / "%Y%m%d-%H%M%S.ts")
-        args = [
+        args = []
+        if self.config.realtime:
+            args += ["-re"]
+        args += [
             "-i",
             self.config.stream_url,
             "-c",
@@ -41,7 +45,8 @@ class StreamBuffer:
             out_pattern,
         ]
         env = os.environ.copy()
-        self.proc = subprocess.Popen(["ffmpeg", "-hide_banner", "-loglevel", "warning"] + args, env=env)
+        env["TZ"] = "UTC"  # segment filenames are parsed as UTC by the clipper; strftime honours TZ
+        self.proc = subprocess.Popen([ffmpeg_bin(), "-hide_banner", "-loglevel", "warning"] + args, env=env)
 
     def stop(self) -> None:
         if self.proc and self.proc.poll() is None:
