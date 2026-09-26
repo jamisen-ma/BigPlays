@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLiveFeed } from './useLiveFeed'
 import { TopBar } from './components/TopBar'
 import { FeedItem } from './components/FeedItem'
+import { LiveStream } from './components/LiveStream'
 import { Player } from './components/Player'
 import { Pipeline } from './components/Pipeline'
 import { GamesTicker } from './components/GamesTicker'
@@ -74,7 +75,7 @@ export default function App() {
           </div>
         </aside>
 
-        <Player h={current} />
+        <div className="watch-column"><LiveStream /><Player h={current} /></div>
 
         <Pipeline pipeline={feed.pipeline} logs={feed.logs} mode={feed.mode} onFire={feed.fireNext} />
       </main>

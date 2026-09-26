@@ -107,3 +107,11 @@ everything is env vars, see `env.example`. the important ones:
 - dont expose the dashboard without putting auth in front of it
 
 MIT
+
+## PPV resolver integration
+
+The dashboard now includes live NBA/NFL stream matching, server-side resolution,
+HLS playback, recording, and a manual highlight-cut button. See
+[setup, environment variables, deployment, and test status](docs/stream-integration.md).
+The provider was unavailable during integration, so real-stream playback has not
+been verified.

@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = Field(default=None, alias="ANTHROPIC_API_KEY")
     llm_model: str = Field(default="claude-3-5-sonnet-20240620", alias="LLM_MODEL")
 
+    resolver_base_url: str = Field(default="http://127.0.0.1:3000", alias="RESOLVER_BASE_URL")
+    resolver_api_key: str = Field(default="", alias="RESOLVER_API_KEY")
+
     # Media
     stream_url: str | None = Field(default=None, alias="STREAM_URL")
     buffer_dir: Path = Field(default=Path("data/buffer"), alias="BUFFER_DIR")

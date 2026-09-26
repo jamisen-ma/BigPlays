@@ -27,6 +27,7 @@ from fastapi.staticfiles import StaticFiles
 
 from bigplays.config import settings
 from bigplays.server.events import bus
+from bigplays.server.streams import router as streams_router, stop_recording
 
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
@@ -97,11 +98,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         yield
     finally:
         watcher.cancel()
+        await stop_recording()
         if _sim:
             _sim.stop()
 
 
 app = FastAPI(title="BigPlays", lifespan=lifespan)
+app.include_router(streams_router)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 settings.clips_dir.mkdir(parents=True, exist_ok=True)

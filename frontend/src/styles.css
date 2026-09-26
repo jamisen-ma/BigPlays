@@ -219,3 +219,11 @@ h1, h2, h3 { margin: 0; }
   .feed { max-height: 34vh; }
   .detail-grid { grid-template-columns: 1fr; }
 }
+
+.watch-column { min-width: 0; overflow-y: auto; }
+.live-stream { padding: 16px; border-bottom: 1px solid #343844; }
+.live-stream form, .live-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.live-stream input[type=url] { flex: 1; min-width: 200px; padding: 8px; }
+.live-stream button { padding: 8px 12px; cursor: pointer; }
+.live-stream video { width: 100%; max-height: 400px; margin-top: 12px; background: black; }
+.live-stream [role=alert] { color: #ff8989; }
