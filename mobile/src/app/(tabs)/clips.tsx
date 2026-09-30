@@ -6,8 +6,10 @@ import { FlatList, Linking, Pressable, RefreshControl, ScrollView, StyleSheet, T
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { SourcePill } from '@/components/ClipCard'
+import { fillFrame, MEDIA_MAX_WIDTH, MediaFrame } from '@/components/MediaFrame'
 import { Chip, Logo, Skeleton, StateBox } from '@/components/ui'
 import { useApi } from '@/lib/ApiContext'
+import { setSoundOn } from '@/lib/autoplay'
 import { useHighlights } from '@/lib/hooks'
 import { C, F, RADIUS } from '@/lib/theme'
 import { describeError } from '@/shared/api'
@@ -28,6 +30,7 @@ export default function ClipsScreen() {
   const play = (h: Highlight) => {
     const video = absUrl(base, highlightVideo(h))
     if (video) {
+      setSoundOn(true)   // tapped to watch: the full-screen player plays with sound
       router.push({ pathname: '/player', params: {
         url: video, title: h.title, league: h.league, kind: sourceKindOf(h),
         poster: absUrl(base, highlightPoster(h)) ?? '',
@@ -81,14 +84,14 @@ const LibraryCard = memo(function LibraryCard({ h, base, onPress }: { h: Highlig
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`Play ${h.title}`} testID={`library-${h.event_id}`}
       style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]}>
-      <View style={s.media}>
-        {poster ? <Image source={{ uri: poster }} style={StyleSheet.absoluteFill} contentFit="cover" transition={150} cachePolicy="memory-disk" />
+      <MediaFrame style={[s.media, !poster && { backgroundColor: C.panel2 }]} testID="library-media">
+        {poster ? <Image source={{ uri: poster }} style={fillFrame} contentFit="contain" transition={150} cachePolicy="memory-disk" />
           : <Text style={s.fallback} numberOfLines={3}>{h.title}</Text>}
         <View style={s.playBtn}><Text style={s.playIcon}>▶</Text></View>
         {!!duration && <Text style={s.duration}>{duration}</Text>}
         {!h.file && !!h.youtube_id && <Text style={s.yt}>YouTube</Text>}
-      </View>
-      <View style={s.meta}>
+      </MediaFrame>
+      <View style={s.meta} testID="library-meta">
         <View style={s.metaRow}>
           <Text style={[s.league, { color: h.league === 'nfl' ? C.nfl : h.league === 'mlb' ? C.mlb : C.text2 }]}>{(h.league || '').toUpperCase()}</Text>
           <SourcePill kind={sourceKindOf(h)} league={h.league} />
@@ -106,8 +109,8 @@ const s = StyleSheet.create({
   count: { color: C.muted, fontSize: 12 },
   filters: { gap: 8, paddingBottom: 12 },
   stale: { color: C.warn, fontSize: 12, marginBottom: 8 },
-  card: { borderRadius: RADIUS, backgroundColor: C.panel, borderWidth: 1, borderColor: C.line, overflow: 'hidden', marginBottom: 12 },
-  media: { width: '100%', aspectRatio: 16 / 9, backgroundColor: C.panel2, alignItems: 'center', justifyContent: 'center' },
+  card: { width: '100%', maxWidth: MEDIA_MAX_WIDTH, alignSelf: 'center', borderRadius: RADIUS, backgroundColor: C.panel, borderWidth: 1, borderColor: C.line, overflow: 'hidden', marginBottom: 12 },
+  media: { alignItems: 'center', justifyContent: 'center' },
   fallback: { color: C.text2, padding: 16, textAlign: 'center', fontWeight: '600' },
   playBtn: { width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(255,106,26,0.92)', alignItems: 'center', justifyContent: 'center' },
   playIcon: { color: C.white, fontSize: 22, marginLeft: 3 },

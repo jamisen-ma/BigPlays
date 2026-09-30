@@ -1,13 +1,14 @@
 // Game screen: ported from frontend/src/games/GameDetail.tsx.
 import { Stack, useLocalSearchParams } from 'expo-router'
-import { useMemo, useState } from 'react'
-import { RefreshControl, SectionList, StyleSheet, Text, View } from 'react-native'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { RefreshControl, SectionList, StyleSheet, Text, View, type ViewToken } from 'react-native'
 
 import { ClipCard } from '@/components/ClipCard'
 import { Linescore } from '@/components/Linescore'
 import { PlayRow } from '@/components/PlayRow'
 import { SituationView } from '@/components/Situation'
 import { Chip, Skeleton, StateBox, StatusPill, TeamLogo } from '@/components/ui'
+import * as autoplay from '@/lib/autoplay'
 import { useGameDetail } from '@/lib/hooks'
 import { C, F, RADIUS } from '@/lib/theme'
 import { describeError } from '@/shared/api'
@@ -21,6 +22,7 @@ export default function GameScreen() {
   const { data, error, loading, refreshing, refresh, base, newClips } = useGameDetail(league, gameId)
   const [latestFirst, setLatestFirst] = useState(true)
   const [viralOnly, setViralOnly] = useState(false)
+  const viewability = useAutoplayViewability()
 
   const game = data?.game
   const plays = data?.plays ?? []
@@ -85,11 +87,30 @@ export default function GameScreen() {
             : g.status === 'pre' ? 'Play-by-play starts at first pitch / kickoff.' : 'No plays yet.'}
         </Text>}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={C.accent} />}
+        viewabilityConfigCallbackPairs={viewability}
         initialNumToRender={20}
         windowSize={11}
       />
     </View>
   )
+}
+
+/**
+ * Instagram-style autoplay on native: report which play rows are on screen (>= 60% to start a clip,
+ * >= 25% to keep it playing, any part for one the viewer started) to lib/autoplay.ts.
+ * Web uses an IntersectionObserver per clip instead (list viewability goes stale there).
+ */
+function useAutoplayViewability() {
+  const pairs = useRef((['start', 'keep', 'any'] as const).map(level => ({
+    viewabilityConfig: {
+      itemVisiblePercentThreshold: 100 * (level === 'start' ? autoplay.START : level === 'keep' ? autoplay.KEEP : autoplay.ANY),
+      minimumViewTime: level === 'start' ? 150 : 0,
+    },
+    onViewableItemsChanged: ({ viewableItems }: { viewableItems: ViewToken[] }) =>
+      autoplay.setVisible(level, viewableItems.map(v => (v.item as Partial<Play> | null)?.play_id).filter((id): id is string => !!id)),
+  }))).current
+  useEffect(() => () => { for (const level of ['start', 'keep', 'any'] as const) autoplay.setVisible(level, []) }, [])
+  return autoplay.usesIntersectionObserver ? undefined : pairs
 }
 
 function HeaderTeam({ team, game }: { team: Team; game: ScoreGame }) {

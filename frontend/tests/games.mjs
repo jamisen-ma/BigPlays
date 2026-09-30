@@ -175,12 +175,14 @@ async function recordWebm() {
   return Buffer.from(b64, 'base64')
 }
 
-async function newPage({ width = 1280, height = 900, mobile = false, poll = { scores: 500, detail: 500 } } = {}) {
+async function newPage({ width = 1280, height = 900, mobile = false, poll = { scores: 500, detail: 500 }, autoplay = false } = {}) {
   const context = await browser.newContext({ viewport: { width, height }, timezoneId: 'America/Los_Angeles',
     isMobile: mobile, hasTouch: mobile, deviceScaleFactor: mobile ? 3 : 1 })
   const page = await context.newPage()
   page.on('pageerror', error => errors.push(error.message))
   await page.addInitScript(p => { window.__BIGPLAYS_POLL_MS__ = p }, poll)
+  // Inline clips autoplay on scroll (autoplay.ts); most checks drive the poster -> click flow, so opt out.
+  if (!autoplay) await page.addInitScript(() => { window.__BIGPLAYS_AUTOPLAY__ = false })
   await page.route('https://i.ytimg.com/**', route => route.fulfill({ contentType: 'image/svg+xml', body: posterSvg }))
   await page.route('https://a.espncdn.com/**', route => route.fulfill({ contentType: 'image/svg+xml', body: logoSvg }))
   await page.route('**/clips/**', route => {
@@ -425,6 +427,21 @@ try {
   await down.locator('.gd-header[data-status]').waitFor()
   await down.close()
   results.degraded = 'passed'
+
+  // ---------------------------------------------------------------- Instagram-style autoplay on scroll
+  // (autoplay.ts) scrolled into view -> plays muted without a click, one at a time; scrolled away -> paused.
+  const auto = await newPage({ width: 1280, height: 600, autoplay: true })
+  await auto.goto(base + '/?view=scores&league=mlb&game=401907924')
+  const autoRow = auto.locator(`[data-play-id="${pid(7)}"]`)
+  await autoRow.locator('.clip-media').waitFor()
+  await autoRow.locator('.clip-media').evaluate(el => el.scrollIntoView({ block: 'center' }))
+  await auto.waitForFunction(id => { const v = document.querySelector(`[data-play-id="${id}"] video`); return v && !v.paused && v.currentTime > 0 }, pid(7), { timeout: 8000 })
+  assert.ok(await autoRow.locator('video').evaluate(v => v.muted), 'autoplay starts muted')
+  assert.equal(await auto.evaluate(() => [...document.querySelectorAll('video')].filter(v => !v.paused).length), 1, 'one clip plays at a time')
+  await auto.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  await auto.waitForFunction(id => document.querySelector(`[data-play-id="${id}"] video`)?.paused, pid(7), { timeout: 3000 })
+  await auto.close()
+  results.autoplayOnScroll = 'passed'
 
   // ---------------------------------------------------------------- 390px iPhone
   const phone = await newPage({ width: 390, height: 844, mobile: true })

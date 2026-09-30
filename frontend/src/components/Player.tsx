@@ -41,30 +41,35 @@ export function Player({ h }: { h: Highlight | null }) {
   return (
     <section className="player">
       <div className="video-wrap" style={{ ['--team' as string]: teamColor ?? 'var(--accent)' }}>
-        {showFootage ? (
-          <YouTubePlayer
-            key={`ft-${h.event_id}`}
-            videoId={h.youtube_id!}
-            start={h.youtube_start ?? 0}
-            end={h.youtube_end ?? null}
-            onError={() => setUseLocal(true)}
-          />
-        ) : src ? (
-          <video ref={ref} key={h.event_id} src={src} poster={poster} autoPlay loop muted={muted} playsInline controls />
-        ) : (
-          <div className="video-missing">clip file missing</div>
-        )}
-        <div className="video-badges">
-          <span className={`league-pill ${h.league}`}>{h.league.toUpperCase()}</span>
-          <span className={`source-pill ${kind}`} data-source-kind={kind} title={SOURCE_DESCRIPTION[kind]}>{sourceLabel(kind, h.league)}</span>
-          <span className="live-pill"><i /> {saved ? showFootage || h.media_kind === 'broadcast' ? 'REPLAY' : 'REPLAY · ANIMATION' : 'AUTO-CLIPPED'}</span>
-          <span className="cut-pill mono">{h.clip_duration != null ? `${h.clip_duration}s cut` : h.youtube_end != null ? `${h.youtube_end - (h.youtube_start ?? 0)}s cut` : '−8s / +6s'}</span>
+        {/* one 16:9 letterboxed frame; badges + tools sit in the bar below it, never over the video */}
+        <div className="video-frame">
+          {showFootage ? (
+            <YouTubePlayer
+              key={`ft-${h.event_id}`}
+              videoId={h.youtube_id!}
+              start={h.youtube_start ?? 0}
+              end={h.youtube_end ?? null}
+              onError={() => setUseLocal(true)}
+            />
+          ) : src ? (
+            <video ref={ref} key={h.event_id} src={src} poster={poster} autoPlay loop muted={muted} playsInline controls />
+          ) : (
+            <div className="video-missing">clip file missing</div>
+          )}
         </div>
-        {!showFootage && (
-          <div className="video-tools">
-            <button className="mute" onClick={() => setMuted(m => !m)} title={muted ? 'Unmute' : 'Mute'}>{muted ? '🔇' : '🔊'}</button>
+        <div className="video-bar">
+          <div className="video-badges">
+            <span className={`league-pill ${h.league}`}>{h.league.toUpperCase()}</span>
+            <span className={`source-pill ${kind}`} data-source-kind={kind} title={SOURCE_DESCRIPTION[kind]}>{sourceLabel(kind, h.league)}</span>
+            <span className="live-pill"><i /> {saved ? showFootage || h.media_kind === 'broadcast' ? 'REPLAY' : 'REPLAY · ANIMATION' : 'AUTO-CLIPPED'}</span>
+            <span className="cut-pill mono">{h.clip_duration != null ? `${h.clip_duration}s cut` : h.youtube_end != null ? `${h.youtube_end - (h.youtube_start ?? 0)}s cut` : '−8s / +6s'}</span>
           </div>
-        )}
+          {!showFootage && (
+            <div className="video-tools">
+              <button className="mute" onClick={() => setMuted(m => !m)} title={muted ? 'Unmute' : 'Mute'}>{muted ? '🔇' : '🔊'}</button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="detail">

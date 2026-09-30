@@ -30,7 +30,8 @@ export const PlayRow = memo(function PlayRow({ play, game, newClip }: { play: Pl
         )}
       </View>
       <Text style={[s.text, play.scoring && { color: C.white, fontWeight: '600' }]}>{play.text}</Text>
-      {play.clip && <ClipCard clip={play.clip} alternates={play.alternate_clips} league={game.league} isNew={newClip} reason={play.viral_reason} />}
+      {play.clip && <ClipCard clip={play.clip} alternates={play.alternate_clips} league={game.league} isNew={newClip} reason={play.viral_reason}
+        autoplayKey={play.play_id} />}
     </View>
   )
 })
