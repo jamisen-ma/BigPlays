@@ -49,7 +49,7 @@ dependencies. Keep those dependencies installed on the local monitor machine.
 Set these in the existing ignored `.env`, preserving its resolver settings:
 
 ```dotenv
-SOCIAL_CLIP_GATE=true
+SOCIAL_CLIP_GATE=legacy
 REDDIT_SOURCE=browser
 REDDIT_ENABLED=true
 REDDIT_POLL_SECONDS=30
@@ -102,7 +102,10 @@ The supervisor reloads `.env` on each app/agent restart.
   highlight potential; it is not proof of broad virality.
 - **Cut manually · skip hype check** is an explicit manual override. It still
   requires the correct historical video window. `SOCIAL_CLIP_GATE=false` restores
-  automatic cutting from the initial sports filter; this checkout leaves it true.
+  automatic cutting from the initial sports filter.
+- This page describes the `legacy` gate. `SOCIAL_CLIP_GATE=true` (or `hype`) now selects the
+  RSS-based hype gate instead (cut, hold, publish on fan hype); see `env.example` and
+  `bigplays/orchestrator/hype_gate.py`.
 
 ## Optional API collection
 

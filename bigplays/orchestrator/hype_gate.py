@@ -858,7 +858,7 @@ class HypeGate:
                                                evidence.get('quotes') or [])
         except LLMBudgetReached:
             result = {'status': 'unavailable', 'error': 'hourly budget reached'}
-        except (LLMUnavailable, ValueError, httpx.HTTPError, asyncio.TimeoutError, OSError) as error:
+        except Exception as error:  # noqa: BLE001 - any model failure means heuristics decide
             result = {'status': 'unavailable', 'error': type(error).__name__}
         return result | {'sample_key': sample_key}
 
@@ -867,6 +867,7 @@ class HypeGate:
         play = self.current_play(play_id)
         if play and play_fingerprint(play) != review['fingerprint']:
             review['fingerprint'] = play_fingerprint(play)  # corrected by ESPN: judge the corrected play
+            review['play'] = {k: play[k] for k in SNAPSHOT_KEYS if play.get(k) not in (None, '')}
             review.pop('llm', None)
             if review['held'] and not play.get('interesting'):
                 self.finish(play_id, review, 'rejected', None, 'rejected: play no longer passes the initial filter')

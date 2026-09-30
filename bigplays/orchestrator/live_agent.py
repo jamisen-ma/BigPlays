@@ -359,6 +359,14 @@ class GameMonitor:
             elif review.get('status') in ('approved', 'fallback'):  # safety net after an interrupted publish
                 gate.publish_decided(play['play_id'], review)
             return
+        held = pending_paths(event_id)['json']
+        if not gate and held.exists():  # gate switched off while clips were held: never strand them
+            decision = (load_json(held, {}).get('pending') or {}).get('decision') or {}
+            if manual or decision.get('status') != 'rejected':
+                self.publish_pending(play['play_id'], reasons=['manual_override'] if manual else ['initial_filter'],
+                                     decided_at=time.time())
+                request.unlink(missing_ok=True)
+            return
         if not manual and mode == 'legacy' and not (self.social and self.social.approved(play)):
             return
         window = self.locate(play)

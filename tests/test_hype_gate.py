@@ -624,3 +624,17 @@ def test_priority_request_takes_the_next_limiter_slot_for_the_busiest_thread(tmp
     assert poller.due_priority() is None  # met: polled after not_before
     asyncio.run(poller.step())
     assert poller.reader.calls == ['Padres', 'CHICubs'] and clock.sleeps[-1] == 30  # back to the shared pace
+
+
+def test_switching_the_gate_off_publishes_held_clips_instead_of_stranding_them(hype_env, monkeypatch):
+    anchor = time.time() - 60
+    play = mlb_play(anchor - 20)
+    monitor = make_monitor(play, anchor)
+    asyncio.run(monitor.clip_play(play))
+    event_id = clip_id(monitor.game, play['play_id'])
+    assert hg.pending_paths(event_id)['json'].exists()
+    monkeypatch.setattr(settings, 'social_clip_gate', 'off')
+    restarted = make_monitor(play, anchor)
+    asyncio.run(restarted.clip_play(play))
+    assert catalog().get(event_id)['reasons'] == ['initial_filter']
+    assert not hg.pending_paths(event_id)['json'].exists()
