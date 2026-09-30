@@ -1,0 +1,22 @@
+{
+  "849845/chris-sale-fans-harper-on-triple-digit-heat": {
+    "play_id": "66b1288a-6657-3b07-91d2-4f93762fcb52",
+    "evidence": "MLB describes a 100 mph Sale strikeout of Harper. Only the first-inning strikeout pitch has startSpeed 100.0; their other strikeout is 82.4 mph in the sixth. Video at 1 second shows Harper at 2-2 and Sale pitch count 15; at 5 seconds it shows FOUR SEAM 100 MPH and Sale with two strikeouts.",
+    "occurred_utc": "2026-09-29T18:22:40.614Z"
+  },
+  "849845/jesus-luzardo-called-strike-to-ozzie-albies-capture-review": {
+    "play_id": "4ac4c9c7-d7ef-3f91-a8d9-868667d71acd",
+    "evidence": "Unique Luzardo/Albies reviewed pitch with isOverturned true and final call Ball: bottom 2, pitch 2. Video shows Luzardo pitch count 14, Albies, a 1-0 count before the pitch, and a 97 mph four-seam fastball. MLB records 97.2 mph and a 2-0 count after review. Timestamp is the underlying pitch startTime, not the review announcement.",
+    "occurred_utc": "2026-09-29T18:42:24.382Z"
+  },
+  "849845/jesus-luzardo-called-strike-to-michael-harris-ii-capture-review-5c82d6": {
+    "play_id": "b07e306d-76ca-3724-b309-ceea05bf9916",
+    "evidence": "Unique Luzardo/Harris II reviewed pitch with isOverturned false and a called strike: bottom 4, pitch 2. Video shows Harris II, Luzardo pitch count 50, inning 4, a 1-0 count before the pitch, and an 85 mph sweeper. MLB records 85.5 mph and a 1-1 count after review. Timestamp is the underlying pitch startTime, not the review announcement.",
+    "occurred_utc": "2026-09-29T19:13:09.528Z"
+  },
+  "849845/jesus-luzardo-called-strike-to-ozzie-albies-capture-review-c70e93": {
+    "play_id": "30ccffbe-2eaa-3941-96b5-d443d68892ab",
+    "evidence": "Unique Luzardo/Albies reviewed pitch with isOverturned true and final call Called Strike: bottom 4, pitch 1. Video shows Luzardo pitch count 52, Albies, inning 4, a 0-0 count, and a 95 mph sinker. MLB records 95.0 mph and a 0-1 count after review. Timestamp is the underlying pitch startTime, not the review announcement.",
+    "occurred_utc": "2026-09-29T19:14:10.634Z"
+  }
+}

@@ -1,9 +1,12 @@
 .venv/
+.venv-local/
 __pycache__/
 *.pyc
 .pytest_cache/
 .env
+cloud.env
 data/
+!bigplays/demo/data/
 frontend/node_modules/
 frontend/dist/
 .claude/

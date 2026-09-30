@@ -1,0 +1,467 @@
+[
+  {
+    "game_id": "401872949",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-27T17:00Z",
+    "play": {
+      "id": "4018729494259",
+      "wallclock": "2026-09-27T20:08:21Z",
+      "period": {
+        "number": 4
+      },
+      "clock": {
+        "displayValue": "1:48"
+      },
+      "awayScore": 18,
+      "homeScore": 21,
+      "text": "(Shotgun) D.Watson pass short left to H.Fannin for 14 yards, TOUCHDOWN. CAR-Ja.Horn was injured during the play. TWO-POINT CONVERSION ATTEMPT. D.Watson pass to D.Boston is complete. ATTEMPT SUCCEEDS."
+    },
+    "previous_scores": {
+      "away": 18,
+      "home": 13
+    },
+    "video_id": 50045467,
+    "source_duration": 39.16,
+    "verified_video_window": [
+      0,
+      14.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872951",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-27T17:00Z",
+    "play": {
+      "id": "4018729511716",
+      "wallclock": "2026-09-27T18:07:45Z",
+      "period": {
+        "number": 2
+      },
+      "clock": {
+        "displayValue": "4:30"
+      },
+      "awayScore": 7,
+      "homeScore": 10,
+      "text": "B.Fisher reported in as eligible.  C.Stroud pass short left to F.Moreau for 1 yard, TOUCHDOWN. K.Fairbairn extra point is GOOD, Center-A.Brinkman, Holder-K.Kroeger."
+    },
+    "previous_scores": {
+      "away": 0,
+      "home": 10
+    },
+    "video_id": 50043901,
+    "source_duration": 18.79,
+    "verified_video_window": [
+      0,
+      10.5
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872951",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-27T17:00Z",
+    "play": {
+      "id": "4018729512388",
+      "wallclock": "2026-09-27T18:48:32Z",
+      "period": {
+        "number": 3
+      },
+      "clock": {
+        "displayValue": "11:40"
+      },
+      "awayScore": 7,
+      "homeScore": 13,
+      "text": "(Shotgun) D.Jones pass deep left intended for J.Downs INTERCEPTED by R.Blankenship [D.Hunter] at HST 1. R.Blankenship ran ob at HST 1 for no gain."
+    },
+    "previous_scores": {
+      "away": 7,
+      "home": 13
+    },
+    "video_id": 50044815,
+    "source_duration": 21.15,
+    "verified_video_window": [
+      0,
+      11.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872960",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-27T20:25Z",
+    "play": {
+      "id": "4018729603063",
+      "wallclock": "2026-09-27T22:39:53Z",
+      "period": {
+        "number": 3
+      },
+      "clock": {
+        "displayValue": "1:48"
+      },
+      "awayScore": 24,
+      "homeScore": 21,
+      "text": "(Shotgun) D.Prescott pass deep right to J.Ferguson for 19 yards, TOUCHDOWN. TWO-POINT CONVERSION ATTEMPT. D.Prescott pass to C.Lamb is complete. ATTEMPT SUCCEEDS."
+    },
+    "previous_scores": {
+      "away": 24,
+      "home": 13
+    },
+    "video_id": 50048200,
+    "source_duration": 17.41,
+    "verified_video_window": [
+      0,
+      8.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872961",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-27T20:25Z",
+    "play": {
+      "id": "4018729613883",
+      "wallclock": "2026-09-27T23:08:01Z",
+      "period": {
+        "number": 4
+      },
+      "clock": {
+        "displayValue": "9:21"
+      },
+      "awayScore": 28,
+      "homeScore": 27,
+      "text": "K.Cousins pass short left to C.White for 4 yards, TOUCHDOWN. TWO-POINT CONVERSION ATTEMPT. K.Cousins is sacked. ATTEMPT FAILS."
+    },
+    "previous_scores": {
+      "away": 22,
+      "home": 27
+    },
+    "video_id": 50047881,
+    "source_duration": 22.76,
+    "verified_video_window": [
+      0,
+      13.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872961",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-27T20:25Z",
+    "play": {
+      "id": "4018729614095",
+      "wallclock": "2026-09-27T23:16:49Z",
+      "period": {
+        "number": 4
+      },
+      "clock": {
+        "displayValue": "6:22"
+      },
+      "awayScore": 35,
+      "homeScore": 27,
+      "text": "(Shotgun) K.Cousins pass short left to B.Bowers for 4 yards, TOUCHDOWN. M.Gay extra point is GOOD, Center-A.Ward, Holder-A.Cole."
+    },
+    "previous_scores": {
+      "away": 28,
+      "home": 27
+    },
+    "video_id": 50047882,
+    "source_duration": 41.59,
+    "verified_video_window": [
+      0,
+      19.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872962",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-28T00:20Z",
+    "play": {
+      "id": "4018729623356",
+      "wallclock": "2026-09-28T02:44:09Z",
+      "period": {
+        "number": 3
+      },
+      "clock": {
+        "displayValue": "2:15"
+      },
+      "awayScore": 16,
+      "homeScore": 16,
+      "text": "(Shotgun) B.Nix pass short right to N.Adkins for 8 yards, TOUCHDOWN. TWO-POINT CONVERSION ATTEMPT. B.Nix pass to P.Bryant is complete. ATTEMPT SUCCEEDS."
+    },
+    "previous_scores": {
+      "away": 16,
+      "home": 8
+    },
+    "video_id": 50049542,
+    "source_duration": 30.79,
+    "verified_video_window": [
+      0,
+      30.79
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872962",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-28T00:20Z",
+    "play": {
+      "id": "4018729624246",
+      "wallclock": "2026-09-28T03:21:02Z",
+      "period": {
+        "number": 4
+      },
+      "clock": {
+        "displayValue": "3:38"
+      },
+      "awayScore": 26,
+      "homeScore": 23,
+      "text": "(No Huddle, Shotgun) M.Stafford pass deep right to K.Mumpfield for 48 yards, TOUCHDOWN. H.Mevis extra point is GOOD, Center-J.Cardona, Holder-E.Evans."
+    },
+    "previous_scores": {
+      "away": 19,
+      "home": 23
+    },
+    "video_id": 50049686,
+    "source_duration": 30.46,
+    "verified_video_window": [
+      0,
+      8.5
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872962",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-28T00:20Z",
+    "play": {
+      "id": "4018729624110",
+      "wallclock": "2026-09-28T03:16:11Z",
+      "period": {
+        "number": 4
+      },
+      "clock": {
+        "displayValue": "4:49"
+      },
+      "awayScore": 19,
+      "homeScore": 23,
+      "text": "(Shotgun) M.Stafford pass short left intended for K.Williams INTERCEPTED by T.Hufanga at DEN 34. T.Hufanga for 66 yards, TOUCHDOWN. W.Lutz extra point is GOOD, Center-M.Fraboni, Holder-J.Crawshaw."
+    },
+    "previous_scores": {
+      "away": 19,
+      "home": 16
+    },
+    "video_id": 50049689,
+    "source_duration": 47.81,
+    "verified_video_window": [
+      0,
+      17.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872962",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-28T00:20Z",
+    "play": {
+      "id": "4018729624746",
+      "wallclock": "2026-09-28T03:43:18Z",
+      "period": {
+        "number": 4
+      },
+      "clock": {
+        "displayValue": "0:47"
+      },
+      "awayScore": 26,
+      "homeScore": 30,
+      "text": "A.Palczewski reported in as eligible.  B.Nix up the middle for 1 yard, TOUCHDOWN. W.Lutz extra point is GOOD, Center-M.Fraboni, Holder-J.Crawshaw.PENALTY on LA-T.McDuffie, Defensive Offside, 5 yards, enforced between downs."
+    },
+    "previous_scores": {
+      "away": 26,
+      "home": 23
+    },
+    "video_id": 50049746,
+    "source_duration": 34.71,
+    "verified_video_window": [
+      0,
+      8.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872962",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-28T00:20Z",
+    "play": {
+      "id": "4018729625085",
+      "wallclock": "2026-09-28T03:54:17Z",
+      "period": {
+        "number": 4
+      },
+      "clock": {
+        "displayValue": "0:02"
+      },
+      "awayScore": 26,
+      "homeScore": 30,
+      "text": "(Shotgun) M.Stafford pass deep right intended for D.Adams INTERCEPTED by T.Hufanga at DEN -1. Touchback."
+    },
+    "previous_scores": {
+      "away": 26,
+      "home": 30
+    },
+    "video_id": 50049788,
+    "source_duration": 31.77,
+    "verified_video_window": [
+      0,
+      11.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872963",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-29T00:15Z",
+    "play": {
+      "id": "401872963315",
+      "wallclock": "2026-09-29T00:23:47Z",
+      "period": {
+        "number": 1
+      },
+      "clock": {
+        "displayValue": "8:47"
+      },
+      "awayScore": 0,
+      "homeScore": 7,
+      "text": "(Shotgun) C.Keenum pass short middle to L.Burden for 8 yards, TOUCHDOWN. C.Santos extra point is GOOD, Center-S.Daly, Holder-T.Taylor."
+    },
+    "previous_scores": {
+      "away": 0,
+      "home": 0
+    },
+    "video_id": 50055667,
+    "source_duration": 18.18,
+    "verified_video_window": [
+      0,
+      14.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872963",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-29T00:15Z",
+    "play": {
+      "id": "4018729632662",
+      "wallclock": "2026-09-29T02:15:02Z",
+      "period": {
+        "number": 3
+      },
+      "clock": {
+        "displayValue": "5:47"
+      },
+      "awayScore": 7,
+      "homeScore": 20,
+      "text": "C.Keenum pass short middle to K.Raymond for 41 yards, TOUCHDOWN. C.Santos extra point is GOOD, Center-S.Daly, Holder-T.Taylor."
+    },
+    "previous_scores": {
+      "away": 7,
+      "home": 13
+    },
+    "video_id": 50056228,
+    "source_duration": 26.91,
+    "verified_video_window": [
+      0,
+      11.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872963",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-29T00:15Z",
+    "play": {
+      "id": "4018729633095",
+      "wallclock": "2026-09-29T02:35:19Z",
+      "period": {
+        "number": 3
+      },
+      "clock": {
+        "displayValue": "0:27"
+      },
+      "awayScore": 7,
+      "homeScore": 20,
+      "text": "(No Huddle, Shotgun) J.Hurts pass short left intended for D.Smith INTERCEPTED by T.Edwards at CHI 42. T.Edwards to CHI 42 for no gain (M.Lemon)."
+    },
+    "previous_scores": {
+      "away": 7,
+      "home": 20
+    },
+    "video_id": 50056320,
+    "source_duration": 30.3,
+    "verified_video_window": [
+      0,
+      13.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  },
+  {
+    "game_id": "401872963",
+    "season": 2026,
+    "season_type": 2,
+    "week": 3,
+    "game_date": "2026-09-29T00:15Z",
+    "play": {
+      "id": "4018729633506",
+      "wallclock": "2026-09-29T02:49:36Z",
+      "period": {
+        "number": 4
+      },
+      "clock": {
+        "displayValue": "7:19"
+      },
+      "awayScore": 7,
+      "homeScore": 27,
+      "text": "C.Keenum up the middle for 1 yard, TOUCHDOWN. C.Santos extra point is GOOD, Center-S.Daly, Holder-T.Taylor.PENALTY on CHI-J.Jackson, Unnecessary Roughness, 15 yards, enforced between downs."
+    },
+    "previous_scores": {
+      "away": 7,
+      "home": 20
+    },
+    "video_id": 50056376,
+    "source_duration": 22.51,
+    "verified_video_window": [
+      0,
+      11.0
+    ],
+    "verification": "Visual review of source frames: teams, quarter, game clock and complete play."
+  }
+]

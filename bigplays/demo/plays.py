@@ -49,6 +49,16 @@ class DemoPlay:
     source_title: str = ""
     source_channel: str = ""
     date: str = ""
+    occurred_utc: Optional[str] = None
+    play_by_play_url: Optional[str] = None
+    season: Optional[int] = None
+    week: Optional[int] = None
+    source_play_id: Optional[str] = None
+    source_url: Optional[str] = None
+    video_url: Optional[str] = None
+    video_start: float = 0
+    video_end: Optional[float] = None
+    media_kind: str = 'animation'
 
 
 PLAYS: List[DemoPlay] = [
@@ -186,8 +196,8 @@ PLAYS: List[DemoPlay] = [
         play_id="nfl_gb_chi_2025_walkoff", league="nfl", game_id="2025-12-20-GB-CHI", date="2025-12-20",
         away="GB", home="CHI", away_color="#203731", home_color="#C83200",
         away_before=16, home_before=16, away_after=16, home_after=22,
-        period="OT", clock="6:12", kind="deep_pass", player="DJ Moore", team="CHI",
-        description="C.Williams pass deep middle to D.Moore for 46 yards, TOUCHDOWN. Bears walk off the Packers in overtime after scoring 10 points in the final 1:59 of regulation.",
+        period="OT", clock="4:50", kind="deep_pass", player="DJ Moore", team="CHI",
+        description="C.Williams pass deep left to D.Moore for 46 yards, TOUCHDOWN. Bears walk off the Packers in overtime after scoring 10 points in the final 1:59 of regulation.",
         title="CALEB TO DJ MOORE FOR 46. BEARS WALK OFF THE PACKERS IN OT",
         rationale="Walk-off overtime touchdown in a first-place division rivalry after a 10-point comeback in the final two minutes. Voted the NFL's Moment of the Year; every heuristic fired.",
         hype_score=0.98, base_score=0.95,
@@ -197,11 +207,13 @@ PLAYS: List[DemoPlay] = [
         social=["CALEB WILLIAMS TO DJ MOORE. BEARS WALK OFF THE PACKERS. CINEMA.", "Soldier Field is shaking", "16-6 with two minutes left. Are you kidding me"],
         social_score=0.98,
         youtube_id="cbf64unxDmI", youtube_start=1, youtube_end=11, source_title="BEARS TAKE DOWN PACKERS - Caleb Williams finds DJ Moore for GAME-WINNING 46-yard TD", source_channel="NFL on FOX",
+        occurred_utc="2025-12-21T04:29:15Z",
+        play_by_play_url="https://www.espn.com/nfl/playbyplay/_/gameId/401772613",
     ),
     DemoPlay(
         play_id="nfl_den_was_2025_burks", league="nfl", game_id="2025-11-30-DEN-WAS", date="2025-11-30",
         away="DEN", home="WAS", away_color="#FB4F14", home_color="#5A1414",
-        away_before=13, home_before=10, away_after=13, home_after=17,
+        away_before=13, home_before=7, away_after=13, home_after=14,
         period="Q3", clock="9:58", kind="deep_pass", player="Treylon Burks", team="WAS",
         description="M.Mariota pass short right to T.Burks for 5 yards, TOUCHDOWN. One-handed catch over R.Moss on 3rd and goal.",
         title="TREYLON BURKS GOES FULL OBJ WITH A ONE-HANDED TOUCHDOWN ON SUNDAY NIGHT",
@@ -213,6 +225,8 @@ PLAYS: List[DemoPlay] = [
         social=["TREYLON BURKS JUST DID THE OBJ CATCH IN THE SAME NUMBER", "OBJ himself is tweeting about it", "catch of the year and it's not close"],
         social_score=0.92,
         youtube_id="DKJB1y7ZzHQ", youtube_start=2, youtube_end=12, source_title="'UNBELIEVABLE!' Treylon Burks makes one-handed touchdown catch vs. Broncos | SNF", source_channel="NFL on NBC",
+        occurred_utc="2025-12-01T03:04:19Z",
+        play_by_play_url="https://www.espn.com/nfl/playbyplay/_/gameId/401772931",
     ),
     DemoPlay(
         play_id="nfl_sf_sea_2026_shaheed", league="nfl", game_id="2026-01-17-SF-SEA", date="2026-01-17",
@@ -229,12 +243,14 @@ PLAYS: List[DemoPlay] = [
         social=["SHAHEED 95 YARDS ON THE OPENING KICK 😱", "Niners haven't run an offensive play and they're down 7", "Lumen Field just hit a new decibel record"],
         social_score=0.91,
         youtube_id="PbNLJJD6-KM", youtube_start=7, youtube_end=17, source_title="Seahawks' Rashid Shaheed takes opening kickoff 95 YARDS for a TOUCHDOWN vs. 49ers", source_channel="NFL on FOX",
+        occurred_utc="2026-01-18T01:21:27Z",
+        play_by_play_url="https://www.espn.com/nfl/playbyplay/_/gameId/401772984",
     ),
     DemoPlay(
         play_id="nfl_lar_chi_2026_kmet", league="nfl", game_id="2026-01-18-LAR-CHI", date="2026-01-18",
         away="LAR", home="CHI", away_color="#003594", home_color="#C83200",
         away_before=17, home_before=10, away_after=17, home_after=17,
-        period="Q4", clock="0:29", kind="deep_pass", player="Caleb Williams", team="CHI",
+        period="Q4", clock="0:18", kind="deep_pass", player="Caleb Williams", team="CHI",
         description="4th down. C.Williams scrambles back to the 40-yard line, escapes pressure and throws to C.Kmet for a TOUCHDOWN. Game tied 17-17; Rams win 20-17 in overtime.",
         title="CALEB RETREATS 30 YARDS AND THROWS A MIRACLE TO KMET ON 4TH DOWN",
         rationale="Fourth-down, season-on-the-line scramble touchdown to force overtime in the divisional round. Even in a losing effort, the play's absurdity drove a 12x social spike.",
@@ -245,6 +261,8 @@ PLAYS: List[DemoPlay] = [
         social=["CALEB WILLIAMS IS A MAGICIAN", "he was at the 40 yard line on a play from the 10", "Bears lost but that throw lives forever"],
         social_score=0.96,
         youtube_id="1DgjDi774FI", youtube_start=10, youtube_end=20, source_title="Caleb Williams makes MIRACULOUS throw to Cole Kmet to tie it late for Bears", source_channel="NFL on NBC",
+        occurred_utc="2026-01-19T02:35:25Z",
+        play_by_play_url="https://www.espn.com/nfl/playbyplay/_/gameId/401772985",
     ),
     DemoPlay(
         play_id="nfl_sea_ne_sb60_nwosu", league="nfl", game_id="2026-02-08-SEA-NE", date="2026-02-08",
@@ -261,6 +279,8 @@ PLAYS: List[DemoPlay] = [
         social=["NWOSU PICK SIX. SUPER BOWL OVER.", "Seattle's defense just put on a clinic", "Maye is going to see that blitz in his sleep"],
         social_score=0.93,
         youtube_id="IuD7uPAALV0", youtube_start=1, youtube_end=11, source_title="Seahawks Uchenna Nwosu SB 60 Pick Six.", source_channel="Sea Hawks Videos",
+        occurred_utc="2026-02-09T02:58:03Z",
+        play_by_play_url="https://www.espn.com/nfl/playbyplay/_/gameId/401772988",
     ),
 ]
 

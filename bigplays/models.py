@@ -9,6 +9,8 @@ from typing import Dict, List, Optional
 class League(str, Enum):
     NBA = "nba"
     NFL = "nfl"
+    NCAAF = "ncaaf"
+    MLB = "mlb"
 
 
 class HighlightReason(str, Enum):
@@ -76,4 +78,3 @@ class HighlightEvent:
     clip_end_utc: datetime
     storage_uri: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
-

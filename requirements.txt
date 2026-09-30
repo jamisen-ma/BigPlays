@@ -21,3 +21,4 @@ beautifulsoup4>=4.12.3
 
 pillow>=10.0.0
 imageio-ffmpeg>=0.5.1
+yt-dlp>=2026.8.19
