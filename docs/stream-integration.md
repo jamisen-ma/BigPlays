@@ -135,7 +135,6 @@ No previous `.env` existed or was overwritten. For a fresh checkout, copy
 | `RESOLVER_API_KEY` | Same random secret of at least 32 characters in Node and FastAPI |
 | `RESOLVER_EMBED_HOSTS` | Exact approved embed hosts; observed `embedindia.st` |
 | `RESOLVER_MEDIA_HOSTS` | Exact approved playlist/segment/key hosts, comma-separated |
-| `DEMO_MODE` | `false` |
 | `LEAGUES` | `["nba","nfl","ncaaf"]`; also enables CFB in the legacy scoreboard agent |
 | `BUFFER_DIR`, `CLIPS_DIR` | Persistent writable media paths; default `data/buffer`, `data/clips` |
 | `AGENT_DIR` | Agent state and timestamped archives; default `data/agent` |

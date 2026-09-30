@@ -96,7 +96,6 @@ def test_api_keeps_metadata_when_video_is_missing_and_restores_when_returned(mon
     catalog.upsert(record)
     monkeypatch.setattr(settings, 'clips_dir', clips)
     monkeypatch.setattr(settings, 'database_path', catalog.path)
-    monkeypatch.setattr(settings, 'demo_mode', False)
     assert load_highlights() == [{**record, 'file': None}]
     assert catalog.all() == [record]
     (clips / record['file']).write_bytes(b'restored video')
@@ -115,9 +114,7 @@ def test_entire_catalog_and_dataset_filter_are_unlimited(monkeypatch, tmp_path):
     assert catalog.all('missing') == []
     monkeypatch.setattr(settings, 'clips_dir', tmp_path)
     monkeypatch.setattr(settings, 'database_path', catalog.path)
-    monkeypatch.setattr(settings, 'demo_mode', True)
-    monkeypatch.setattr(settings, 'demo_dataset', 'nfl-2026-week3')
-    assert len(load_highlights()) == 350
+    assert len(load_highlights()) == 351
 
 
 def test_parallel_imports_are_idempotent(tmp_path):

@@ -87,7 +87,7 @@ function ClipsApp({ nav }: { nav: ReactNode }) {
     <div className="app">
       <TopBar
         nav={nav}
-        connected={feed.connected} mode={feed.mode} highlights={feed.highlights} games={feed.games}
+        connected={feed.connected} highlights={feed.highlights} games={feed.games}
         filter={filter} setFilter={value => { setFilter(value); setGame('all'); setFollow(false) }} follow={follow} setFollow={setFollow}
       />
       <main className="layout">
@@ -140,14 +140,14 @@ function ClipsApp({ nav }: { nav: ReactNode }) {
             const highlight = feed.highlights.find(h => h.league === 'mlb' && h.game_id === id)
             if (highlight) setSelected(highlight.event_id)
           }} />
-          {feed.mode !== 'demo' && <><AgentMonitor /><LiveStream /></>}
+          <AgentMonitor /><LiveStream />
           <Player h={current} />
           <SocialFeed league={filter === 'mlb' ? 'mlb' : filter === 'nfl' ? 'nfl' : current?.league === 'mlb' ? 'mlb' : 'nfl'}
             currentClipId={selected} clipTitle={id => feed.highlights.find(h => h.event_id === id)?.title}
             onSelectClip={id => { setSelected(id); setFollow(false) }} />
         </div>
 
-        <Pipeline pipeline={feed.pipeline} logs={feed.logs} mode={feed.mode} onFire={feed.fireNext} />
+        <Pipeline pipeline={feed.pipeline} logs={feed.logs} />
       </main>
       <GamesTicker games={feed.games} />
 

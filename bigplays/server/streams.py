@@ -57,8 +57,6 @@ async def resolve_stream(body: ResolveInput):
         return failure('input', 'Expected an HTTPS ppv.st/live/... or ppv.to/live/... event URL')
     if not settings.resolver_api_key:
         return failure('config', 'Set RESOLVER_API_KEY on the backend and resolver', 503)
-    if body.record and settings.demo_mode:
-        return failure('record', 'Turn off DEMO_MODE before recording a live event')
     async with lock:
         if body.record and recording and recording.proc and recording.proc.poll() is None:
             return failure('record', 'Stop the current recording before switching events', 409)

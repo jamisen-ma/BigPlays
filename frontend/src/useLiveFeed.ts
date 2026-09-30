@@ -10,7 +10,6 @@ export interface CurrentPipeline {
 
 export interface LiveState {
   connected: boolean
-  mode: 'demo' | 'live' | null
   games: Game[]
   highlights: Highlight[]
   pipeline: CurrentPipeline | null
@@ -40,7 +39,7 @@ export function mergeHistory(current: Highlight[], recent: Highlight[]): Highlig
 
 export function useLiveFeed() {
   const [state, setState] = useState<LiveState>({
-    connected: false, mode: null, games: [], highlights: [], pipeline: null, logs: [], lastArrival: null,
+    connected: false, games: [], highlights: [], pipeline: null, logs: [], lastArrival: null,
   })
   const logId = useRef(0)
 
@@ -61,9 +60,9 @@ export function useLiveFeed() {
         // On a reconnect, clips that landed while we were disconnected are real arrivals too.
         const known = new Set(s.highlights.map(h => h.event_id))
         const missed = s.highlights.length ? highlights.find(h => !known.has(h.event_id)) : undefined
-        return { ...s, mode: d.mode, games: d.games ?? [], highlights, connected: true, lastArrival: missed ?? s.lastArrival }
+        return { ...s, games: d.games ?? [], highlights, connected: true, lastArrival: missed ?? s.lastArrival }
       })
-      log('info', `connected · mode=${d.mode} · ${d.recent?.length ?? 0} highlights on disk`)
+      log('info', `connected · ${d.recent?.length ?? 0} highlights on disk`)
     })
 
     es.addEventListener('game_tick', (e) => {
@@ -125,9 +124,5 @@ export function useLiveFeed() {
     if (arrival) log('highlight', `VIRAL · ${arrival.title} (hype ${(arrival.llm?.hype_score ?? arrival.combined_score ?? 0).toFixed(2)})`, arrival.ts)
   }, [arrival, log])
 
-  const fireNext = useCallback(async () => {
-    await fetch('/api/demo/next', { method: 'POST' })
-  }, [])
-
-  return { ...state, fireNext }
+  return state
 }

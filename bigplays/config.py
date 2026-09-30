@@ -44,14 +44,6 @@ class Settings(BaseSettings):
     s3_bucket: str | None = Field(default=None, alias="S3_BUCKET")
     s3_prefix: str = Field(default="highlights/", alias="S3_PREFIX")
 
-    # Demo mode (replays scripted plays with synthetic clips when no live games exist)
-    demo_mode: bool = Field(default=False, alias="DEMO_MODE")
-    demo_league: Literal['all', 'nba', 'nfl'] = Field(default='all', alias='DEMO_LEAGUE')
-    demo_dataset: Literal['highlights', 'nfl-2026-week3'] = Field(default='highlights', alias='DEMO_DATASET')
-    demo_clips_dir: Path = Field(default=Path("data/demo_clips"), alias="DEMO_CLIPS_DIR")
-    demo_min_interval: float = Field(default=7.0, alias="DEMO_MIN_INTERVAL")
-    demo_max_interval: float = Field(default=14.0, alias="DEMO_MAX_INTERVAL")
-
     # Server
     server_host: str = Field(default="0.0.0.0", alias="SERVER_HOST")
     server_port: int = Field(default=8000, alias="SERVER_PORT")

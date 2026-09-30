@@ -311,55 +311,14 @@ cli.add_typer(server, name="server")
 def server_run(
     host: Optional[str] = None,
     port: Optional[int] = None,
-    demo: bool = typer.Option(False, "--demo", help="Replay scripted plays with synthetic clips (no live games needed)"),
-    demo_league: Optional[str] = typer.Option(None, '--demo-league', help='Replay only nfl, nba, or all'),
 ) -> None:
     load_dotenv()
     configure_logging()
     _ensure_dirs()
-    if demo_league is not None:
-        if demo_league not in ('all', 'nba', 'nfl'):
-            raise typer.BadParameter('Choose nfl, nba, or all', param_hint='--demo-league')
-        settings.demo_league = demo_league
-    if demo or settings.demo_mode:
-        settings.demo_mode = True
-        from bigplays.demo.clip_gen import render_all
-        from bigplays.demo.replay import replay_plays
-
-        plays = replay_plays(settings.demo_dataset, settings.demo_league)
-        if settings.demo_dataset == 'highlights':
-            render_all(settings.demo_clips_dir, only=[p.play_id for p in plays])
-        elif any(not (settings.demo_clips_dir / f'{p.play_id}.mp4').exists() for p in plays):
-            from bigplays.storage.catalog import catalog_for
-            catalog = catalog_for(settings.clips_dir, settings.database_path)
-            catalog.migrate_sidecars(settings.clips_dir)
-            if not any(record.get('imported') and record.get('file')
-                       and (settings.clips_dir / record['file']).is_file()
-                       for record in catalog.all(settings.demo_dataset)):
-                raise typer.BadParameter('Import Week 3 footage first: python -m bigplays.ingest.week3_archive')
     h = host or settings.server_host
     p = port or settings.server_port
     # short graceful-shutdown window so open SSE streams don't keep a dying server alive
     uvicorn.run(fastapi_app, host=h, port=p, reload=False, timeout_graceful_shutdown=2)
-
-
-demo = typer.Typer(help="Demo utilities: synthetic clips and scripted live replay.")
-cli.add_typer(demo, name="demo")
-
-
-@demo.command("clips")
-def demo_clips(force: bool = typer.Option(False, "--force", help="Re-render even if clips exist")) -> None:
-    """Render synthetic highlight clips for every scripted demo play."""
-    from bigplays.demo.clip_gen import render_all
-
-    outs = render_all(settings.demo_clips_dir, force=force)
-    typer.echo(f"{len(outs)} demo clips in {settings.demo_clips_dir}")
-
-
-@demo.command("run")
-def demo_run(host: Optional[str] = None, port: Optional[int] = None) -> None:
-    """Start the server in demo mode (same as `server run --demo`)."""
-    server_run(host=host, port=port, demo=True, demo_league=None)
 
 
 assemble = typer.Typer(help="Assemble reels from existing clips.")
@@ -368,7 +327,7 @@ cli.add_typer(assemble, name="assemble")
 
 @assemble.command("reels")
 def assemble_reels() -> None:
-    # Simple demo: build a chronological reel of all current clips
+    # Build a chronological reel of all current clips
     from bigplays.assembly.reel_builder import build_reel
 
     clips = sorted(settings.clips_dir.glob("*.mp4"))

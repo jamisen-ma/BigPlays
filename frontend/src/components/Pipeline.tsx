@@ -3,7 +3,7 @@ import type { CurrentPipeline } from '../useLiveFeed'
 import { STAGES, STAGE_LABEL, type LogLine } from '../types'
 import { clockTime } from './util'
 
-export function Pipeline({ pipeline, logs, mode, onFire }: { pipeline: CurrentPipeline | null; logs: LogLine[]; mode: 'demo' | 'live' | null; onFire: () => void }) {
+export function Pipeline({ pipeline, logs }: { pipeline: CurrentPipeline | null; logs: LogLine[] }) {
   const logRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = logRef.current
@@ -44,7 +44,6 @@ export function Pipeline({ pipeline, logs, mode, onFire }: { pipeline: CurrentPi
 
       <div className="panel-head small">
         <h3>Agent log</h3>
-        {mode === 'demo' && <button className="fire" onClick={onFire}>⚡ Fire next play</button>}
       </div>
       <div className="log" ref={logRef}>
         {logs.map(l => (

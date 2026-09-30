@@ -7,7 +7,6 @@ Endpoints
 - GET  /api/highlights        all highlight records (newest first)
 - GET  /api/games             live game states being monitored
 - GET  /api/stream            Server-Sent Events: hello, game_tick, pipeline, highlight, log
-- POST /api/demo/next         (demo mode) fire the next play immediately
 - GET  /clips/<file>          static mp4 / jpg / json
 - GET  /                      React dashboard (frontend/dist) when built
 """
@@ -37,7 +36,6 @@ from bigplays.storage.catalog import catalog_for
 
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
-_sim = None  # DemoSimulator when demo mode is on
 _seen_sidecars: dict[str, int] = {}
 _mlb_error: str | None = None
 
@@ -52,18 +50,10 @@ def load_highlights() -> List[dict]:
     catalog.migrate_sidecars(clips_dir)
     items: List[dict] = []
     for data in catalog.all():
-        if not visible_highlight(data):
-            continue
         if not data.get("file") or not (clips_dir / data["file"]).exists():
             data["file"] = None
         items.append(data)
     return items
-
-
-def visible_highlight(record: dict) -> bool:
-    return (not settings.demo_mode or settings.demo_dataset == 'highlights'
-            or record.get('replay_dataset') == settings.demo_dataset
-            or record.get('league') == 'mlb')
 
 
 def mlb_status() -> dict:
@@ -80,7 +70,7 @@ def saved_mlb_games() -> list[dict]:
 
 
 def game_list() -> list[dict]:
-    return _sim.game_list() if _sim else saved_mlb_games()
+    return saved_mlb_games()
 
 
 async def _watch_mlb() -> None:
@@ -126,10 +116,6 @@ async def _watch_clips_dir() -> None:
         await asyncio.sleep(2.0)
         try:
             for event, data in changed_highlights(_seen_sidecars):
-                if not visible_highlight(data):
-                    continue
-                if _sim and data.get('demo') and not data.get('imported'):
-                    continue
                 bus.publish(event, data)
         except Exception as ex:
             bus.publish("log", {"level": "error", "msg": f"watcher: {ex}"})
@@ -137,25 +123,11 @@ async def _watch_clips_dir() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    global _sim
     settings.clips_dir.mkdir(parents=True, exist_ok=True)
     catalog_for(settings.clips_dir, settings.database_path).migrate_sidecars(settings.clips_dir)
     bus.bind_loop(asyncio.get_running_loop())
     watcher = asyncio.create_task(_watch_clips_dir())
     mlb_watcher = asyncio.create_task(_watch_mlb()) if settings.mlb_highlights_enabled else None
-    if settings.demo_mode:
-        from bigplays.demo.simulator import DemoSimulator
-
-        _sim = DemoSimulator(
-            bus, settings.clips_dir, settings.demo_clips_dir,
-            min_interval=settings.demo_min_interval, max_interval=settings.demo_max_interval,
-            league=settings.demo_league,
-            dataset=settings.demo_dataset,
-            database_path=settings.database_path,
-        )
-        _sim.extra_games = saved_mlb_games
-        _sim.start()
-        bus.publish("log", {"level": "info", "msg": "Replay started; saved highlights restored from SQLite"})
     try:
         yield
     finally:
@@ -163,9 +135,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if mlb_watcher:
             mlb_watcher.cancel()
         await stop_recording()
-        if _sim:
-            _sim.stop()
-            _sim = None
 
 
 app = FastAPI(title="BigPlays", lifespan=lifespan)
@@ -182,9 +151,7 @@ app.mount("/clips", StaticFiles(directory=str(settings.clips_dir)), name="clips"
 @app.get("/api/status")
 def api_status():
     return _json_response({
-        "mode": "demo" if settings.demo_mode else "live",
-        "demo_league": settings.demo_league if settings.demo_mode else None,
-        "demo_dataset": settings.demo_dataset if settings.demo_mode else None,
+        "mode": "live",
         "leagues": settings.leagues,
         "use_llm": settings.use_llm,
         "llm_model": settings.llm_model,
@@ -212,14 +179,6 @@ def api_mlb_games():
     return _json_response(mlb_status())
 
 
-@app.post("/api/demo/next")
-def api_demo_next():
-    if not _sim:
-        return JSONResponse({"error": "demo mode is off"}, status_code=400)
-    _sim.next_now()
-    return _json_response({"ok": True})
-
-
 def _sse(event: str, data: dict) -> bytes:
     return f"event: {event}\ndata: {orjson.dumps(data).decode()}\n\n".encode()
 
@@ -231,7 +190,7 @@ async def api_stream(request: Request):
     async def gen() -> AsyncIterator[bytes]:
         try:
             yield _sse("hello", {
-                "mode": "demo" if settings.demo_mode else "live",
+                "mode": "live",
                 "games": game_list(),
                 "recent": load_highlights(),
                 "pipeline": [e.data | {"ts": e.ts} for e in bus.recent(["pipeline"], 40)],
