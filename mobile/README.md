@@ -18,7 +18,7 @@ A personal iPhone app for BigPlays: an ESPN-style scoreboard and play-by-play fo
 The API base is resolved in this order (`src/shared/apiBase.ts`):
 
 1. **Settings override**, saved in AsyncStorage.
-2. **`EXPO_PUBLIC_API_URL`**, read when Metro starts, e.g. `EXPO_PUBLIC_API_URL=http://100.78.97.55:8765`.
+2. **`EXPO_PUBLIC_API_URL`**, read when Metro starts, e.g. `EXPO_PUBLIC_API_URL=http://100.85.158.89:8765`.
 3. **The Metro host.** The app takes the host the phone loaded the JS bundle from (`expoConfig.hostUri`). The port is `EXPO_PUBLIC_API_PORT` if set; otherwise **8765** for a Tailscale host (100.64.0.0/10 or `*.ts.net`, which goes through `scripts/tailnet_proxy.py`) and **8000** for anything else (LAN or localhost web).
 4. `http://127.0.0.1:8000`. This only works in a simulator or web on the Mac.
 
@@ -26,14 +26,14 @@ Clip and poster URLs come back relative (`/clips/<file>`) and are prefixed with 
 
 ## Backend reachability (Tailscale)
 
-The backend stays on **127.0.0.1:8000**. `scripts/tailnet_proxy.py` (run by the lead) forwards **100.78.97.55:8765 -> 127.0.0.1:8000** on the Mac's Tailscale IP, so the phone's API URL is **`http://100.78.97.55:8765`**. Don't use port 8000 from the phone; `*:8000` is held by an unrelated process. `tailscale serve` doesn't work with the Mac App Store build of Tailscale, which is why the proxy exists. CORS is `*`, so the web preview works too.
+The backend stays on **127.0.0.1:8000**. `scripts/tailnet_proxy.py` (run by the lead) forwards **100.85.158.89:8765 -> 127.0.0.1:8000** on the Mac's Tailscale IP, so the phone's API URL is **`http://100.85.158.89:8765`**. Don't use port 8000 from the phone; `*:8000` is held by an unrelated process. `tailscale serve` doesn't work with the Mac App Store build of Tailscale, which is why the proxy exists. CORS is `*`, so the web preview works too.
 
 ## Run it on your iPhone (Expo Go, SDK 57)
 
 One-time setup:
 
 1. Install **Expo Go** from the App Store. It must support SDK 57, which is the current `expo@latest`.
-2. Install **Tailscale** on the iPhone and sign in to the same account as the Mac. The Mac is `100.78.97.55`.
+2. Install **Tailscale** on the iPhone and sign in to the same account as the Mac. The Mac is `100.85.158.89`.
 3. `cd mobile && npm install`
 
 Each session:
@@ -42,16 +42,16 @@ Each session:
 # on the Mac: backend on 127.0.0.1:8000 and scripts/tailnet_proxy.py (:8765) must be running
 cd mobile
 npm run start:tailscale
-#  = REACT_NATIVE_PACKAGER_HOSTNAME=100.78.97.55 EXPO_PUBLIC_API_URL=http://100.78.97.55:8765 expo start
-#  Metro prints: exp://100.78.97.55:8081
+#  = REACT_NATIVE_PACKAGER_HOSTNAME=100.85.158.89 EXPO_PUBLIC_API_URL=http://100.85.158.89:8765 expo start
+#  Metro prints: exp://100.85.158.89:8081
 ```
 
 On the iPhone:
 
 1. Turn **Tailscale** on.
 2. Open **Expo Go**.
-3. Scan the terminal QR code with the Camera app (or use `mobile/expo-go-qr.png` if it exists), or in Expo Go tap "Enter URL manually" and type `exp://100.78.97.55:8081`.
-4. If Scores says "Can't reach BigPlays at ...", go to **Settings**, set the API URL to `http://100.78.97.55:8765`, tap **Test**, then **Save**.
+3. Scan the terminal QR code with the Camera app (or use `mobile/expo-go-qr.png` if it exists), or in Expo Go tap "Enter URL manually" and type `exp://100.85.158.89:8081`.
+4. If Scores says "Can't reach BigPlays at ...", go to **Settings**, set the API URL to `http://100.85.158.89:8765`, tap **Test**, then **Save**.
 
 If the Mac's Tailscale IP ever changes, get it with `/Applications/Tailscale.app/Contents/MacOS/Tailscale ip -4` and update the `start:tailscale` script.
 

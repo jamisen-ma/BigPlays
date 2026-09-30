@@ -5,7 +5,7 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "start:tailscale": "REACT_NATIVE_PACKAGER_HOSTNAME=100.78.97.55 EXPO_PUBLIC_API_URL=http://100.78.97.55:8765 expo start",
+    "start:tailscale": "REACT_NATIVE_PACKAGER_HOSTNAME=100.85.158.89 EXPO_PUBLIC_API_URL=http://100.85.158.89:8765 expo start",
     "start:tunnel": "expo start --tunnel",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
