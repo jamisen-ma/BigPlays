@@ -126,10 +126,14 @@
 .score-pill { color: #05261a; background: var(--ok); }
 .viral-pill { color: #fff; background: var(--accent); }
 
-.clip-card { margin-top: 8px; position: relative; }
-.clip-media { position: relative; border-radius: 10px; overflow: hidden; background: #000; aspect-ratio: 16 / 9; }
-.clip-media video { width: 100%; height: 100%; display: block; background: #000; }
-.clip-poster { position: absolute; inset: 0; width: 100%; background: linear-gradient(135deg, #1b2130, #0b0e14) center / cover no-repeat; display: grid; place-items: center; }
+/* One 16:9 media frame per card: the poster and the playing <video> both fill it absolutely, so
+   pressing play never shifts layout and resizing only scales it. Both letterbox (contain) on black,
+   so nothing is ever cropped. Badges + "source · reason" sit below it in .clip-meta. */
+.clip-card { position: relative; width: 100%; max-width: 720px; margin: 8px auto 0; }
+.clip-media { position: relative; width: 100%; aspect-ratio: 16 / 9; min-height: 0; border-radius: 10px; overflow: hidden; background: #000; }
+.clip-media > video, .clip-poster { position: absolute; inset: 0; width: 100%; height: 100%; }
+.clip-media > video { display: block; object-fit: contain; background: #000; }
+.clip-poster { background: linear-gradient(135deg, #1b2130, #0b0e14) center / contain no-repeat #000; display: grid; place-items: center; }
 .clip-poster:disabled { cursor: default; opacity: .6; }
 .clip-poster-fallback { position: absolute; left: 12px; right: 12px; top: 10px; text-align: left; font-family: var(--display); font-weight: 700; font-size: 16px; color: var(--text-2); }
 .play-btn { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; padding-left: 4px; font-size: 20px; color: #fff; background: rgba(255,106,26,.92); box-shadow: 0 6px 24px rgba(0,0,0,.5); transition: transform .15s; }
@@ -153,7 +157,6 @@
 
 @media (min-width: 640px) {
   .game-grid, .unmatched-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .play-row.viral .clip-card { max-width: 520px; }
   .gh-score { font-size: 44px; }
 }
 @media (min-width: 1000px) {
