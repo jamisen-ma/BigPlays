@@ -1,0 +1,15 @@
+version: '0.5'
+processes:
+  resolver:
+    command: node --env-file=.env ppv-hls-stream-resolver/src/server.js
+    availability:
+      restart: on_failure
+  app:
+    # Read fresh local settings on each restart, overriding the supervisor's old snapshot.
+    command: .venv-local/bin/python -m dotenv -f .env run --override -- .venv-local/bin/python -m bigplays.main server run --host 127.0.0.1 --port 8000
+    availability:
+      restart: on_failure
+  agent:
+    command: .venv-local/bin/python -m dotenv -f .env run --override -- .venv-local/bin/python -m bigplays.orchestrator.live_agent
+    availability:
+      restart: on_failure

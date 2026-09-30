@@ -228,16 +228,18 @@ def _upload_if_enabled(local_path: Path, metadata: dict) -> str:
 
 
 @agent.command("run")
-def agent_run(league: Optional[str] = typer.Option(None, help="nba|nfl or omit for both")) -> None:
+def agent_run(league: Optional[str] = typer.Option(None, help="nba|nfl|ncaaf or omit for configured leagues")) -> None:
     load_dotenv()
     configure_logging()
     _ensure_dirs()
     log = get_logger("agent")
     leagues: List[League] = []
     if league:
+        if league == 'mlb':
+            raise typer.BadParameter('MLB uses the official collector: python -m bigplays.ingest.mlb_archive')
         leagues = [League(league)]
     else:
-        leagues = [League(l) for l in settings.leagues]
+        leagues = [League(l) for l in settings.leagues if l != 'mlb']
 
     last_states: Dict[str, GameState] = {}
     social_stream = mock_social_bursts()
@@ -310,17 +312,31 @@ def server_run(
     host: Optional[str] = None,
     port: Optional[int] = None,
     demo: bool = typer.Option(False, "--demo", help="Replay scripted plays with synthetic clips (no live games needed)"),
+    demo_league: Optional[str] = typer.Option(None, '--demo-league', help='Replay only nfl, nba, or all'),
 ) -> None:
     load_dotenv()
     configure_logging()
     _ensure_dirs()
-    if demo:
+    if demo_league is not None:
+        if demo_league not in ('all', 'nba', 'nfl'):
+            raise typer.BadParameter('Choose nfl, nba, or all', param_hint='--demo-league')
+        settings.demo_league = demo_league
+    if demo or settings.demo_mode:
         settings.demo_mode = True
-        if not any(settings.demo_clips_dir.glob("*.mp4")):
-            from bigplays.demo.clip_gen import render_all
+        from bigplays.demo.clip_gen import render_all
+        from bigplays.demo.replay import replay_plays
 
-            typer.echo("No demo clips found; rendering synthetic clips...")
-            render_all(settings.demo_clips_dir)
+        plays = replay_plays(settings.demo_dataset, settings.demo_league)
+        if settings.demo_dataset == 'highlights':
+            render_all(settings.demo_clips_dir, only=[p.play_id for p in plays])
+        elif any(not (settings.demo_clips_dir / f'{p.play_id}.mp4').exists() for p in plays):
+            from bigplays.storage.catalog import catalog_for
+            catalog = catalog_for(settings.clips_dir, settings.database_path)
+            catalog.migrate_sidecars(settings.clips_dir)
+            if not any(record.get('imported') and record.get('file')
+                       and (settings.clips_dir / record['file']).is_file()
+                       for record in catalog.all(settings.demo_dataset)):
+                raise typer.BadParameter('Import Week 3 footage first: python -m bigplays.ingest.week3_archive')
     h = host or settings.server_host
     p = port or settings.server_port
     # short graceful-shutdown window so open SSE streams don't keep a dying server alive
@@ -343,7 +359,7 @@ def demo_clips(force: bool = typer.Option(False, "--force", help="Re-render even
 @demo.command("run")
 def demo_run(host: Optional[str] = None, port: Optional[int] = None) -> None:
     """Start the server in demo mode (same as `server run --demo`)."""
-    server_run(host=host, port=port, demo=True)
+    server_run(host=host, port=port, demo=True, demo_league=None)
 
 
 assemble = typer.Typer(help="Assemble reels from existing clips.")
@@ -366,4 +382,3 @@ def assemble_reels() -> None:
 
 if __name__ == "__main__":
     cli()
-

@@ -14,6 +14,8 @@
   --claude: #d97757;
   --nba: #f97316;
   --nfl: #22c55e;
+  --ncaaf: #a78bfa;
+  --mlb: #60a5fa;
   --hype-lo: #60a5fa;
   --hype-mid: #fbbf24;
   --hype-hi: #fb7185;
@@ -65,6 +67,10 @@ h1, h2, h3 { margin: 0; }
 .count { font-size: 12px; color: var(--muted); }
 
 /* ------------------------------------------------------------ feed */
+.library-filters { display: grid; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.library-filters input, .library-filters select { width: 100%; min-width: 0; padding: 8px 10px; color: var(--text); background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 6px; font: inherit; }
+.library-filters input:focus, .library-filters select:focus { outline: 1px solid var(--accent); }
+.saved-duration { font-size: 11px; text-align: center; color: var(--text-2); padding: 6px 0; background: var(--panel-2); border-radius: 6px; }
 .feed-list { overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
 .feed-item { display: grid; grid-template-columns: 96px 1fr 48px; gap: 10px; align-items: center; padding: 8px; border-radius: 10px; text-align: left; border: 1px solid transparent; background: var(--bg-2); transition: background .15s, border-color .15s, transform .15s; }
 .feed-item:hover { background: var(--panel-2); }
@@ -90,6 +96,8 @@ h1, h2, h3 { margin: 0; }
 .league-pill { font-family: var(--display); font-weight: 800; font-size: 10px; letter-spacing: 1px; padding: 1px 6px; border-radius: 4px; color: #000; }
 .league-pill.nba { background: var(--nba); }
 .league-pill.nfl { background: var(--nfl); }
+.league-pill.ncaaf { background: var(--ncaaf); }
+.league-pill.mlb { background: var(--mlb); }
 
 /* ------------------------------------------------------------ hype */
 .hype { position: relative; flex: none; }
@@ -135,7 +143,7 @@ h1, h2, h3 { margin: 0; }
 .mute { font-size: 16px; padding: 3px 8px; border-radius: 6px; background: rgba(0,0,0,.55); }
 .detail { padding: 16px 18px 18px; }
 .detail-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
-.detail-game { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); }
+.detail-game { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); }
 .team { display: inline-flex; align-items: center; gap: 6px; }
 .team::before { content: ''; width: 10px; height: 10px; border-radius: 2px; background: var(--c, var(--muted)); }
 .team b { color: var(--text); font-family: var(--mono); }
@@ -143,6 +151,9 @@ h1, h2, h3 { margin: 0; }
 .clock { margin-left: 4px; padding: 1px 6px; border-radius: 4px; background: var(--panel-2); font-size: 11px; }
 .headline { font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1.02; letter-spacing: .2px; margin: 8px 0 6px; text-wrap: balance; }
 .pbp { margin: 0; color: var(--text-2); }
+.pbp a { color: var(--accent); }
+.feed-event-time { display: grid; gap: 2px; margin-top: 5px; font-size: 10px; color: var(--text-2); }
+.replay-timestamps { display: grid; gap: 4px; font-size: 12px; color: var(--text-2); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
 .chip { font-size: 11px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--text-2); }
 .chip.reason { background: var(--panel-2); color: var(--text); font-weight: 600; }
@@ -221,9 +232,56 @@ h1, h2, h3 { margin: 0; }
 }
 
 .watch-column { min-width: 0; overflow-y: auto; }
+.mlb-games { padding: 12px; margin-bottom: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.mlb-games-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 8px; }
+.mlb-games-heading h3 { font-family: var(--display); font-size: 18px; }
+.mlb-games-heading > span { font-size: 10px; color: var(--text-2); }
+.mlb-game-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.mlb-game-card { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; display: grid; gap: 2px; text-align: left; background: var(--bg-2); font-size: 11px; }
+.mlb-game-card:not(:disabled):hover { border-color: var(--mlb); }
+.mlb-game-card:disabled { cursor: default; }
+.mlb-series { color: var(--mlb); font-size: 10px; }
 .live-stream { padding: 16px; border-bottom: 1px solid #343844; }
 .live-stream form, .live-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .live-stream input[type=url] { flex: 1; min-width: 200px; padding: 8px; }
 .live-stream button { padding: 8px 12px; cursor: pointer; }
 .live-stream video { width: 100%; max-height: 400px; margin-top: 12px; background: black; }
 .live-stream [role=alert] { color: #ff8989; }
+
+/* ------------------------------------------------------------ provenance */
+.source-pill { flex: none; font-family: var(--display); font-weight: 800; font-size: 10px; letter-spacing: 1px; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--line-2); color: var(--text-2); background: var(--panel-2); }
+.source-pill.live_capture { color: #fff; background: rgba(255,59,71,.18); border-color: rgba(255,59,71,.6); }
+.source-pill.replay { color: var(--hype-mid); background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.45); }
+.source-pill.official_upload { color: var(--mlb); background: rgba(96,165,250,.1); border-color: rgba(96,165,250,.45); }
+.video-badges .source-pill { font-size: 11px; padding: 2px 8px; background-color: rgba(0,0,0,.6); }
+
+/* ------------------------------------------------------------ social feed */
+.social-feed { margin-top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.social-providers { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 11px; }
+.provider-status { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--text-2); background: var(--bg-2); }
+.provider-status i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.provider-status.good i { background: var(--ok); }
+.provider-status.bad i { background: var(--live); }
+.provider-status.warn i { background: var(--hype-mid); }
+.provider-status.off i { background: var(--line-2); }
+.provider-status em { font-style: normal; color: var(--hype-mid); }
+.social-cache { padding: 6px 14px; font-size: 11px; color: var(--text-2); border-bottom: 1px solid var(--line); }
+.social-cache.stale { color: var(--hype-mid); background: rgba(251,191,36,.06); }
+.social-post.current { border-color: var(--accent); }
+.play-match { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 2px 0 4px; font-size: 11px; }
+.play-match button { color: var(--ok); font-weight: 600; font-size: 11px; text-align: left; }
+.play-match button:hover { text-decoration: underline; }
+.provider-status.unavailable { border-style: dashed; }
+.social-group + .social-group { border-top: 1px solid var(--line); }
+.social-group-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px 4px; font-size: 11px; }
+.social-group-head .count { margin-left: auto; }
+.relevance-pill { font-family: var(--display); font-weight: 800; font-size: 10px; letter-spacing: 1px; padding: 1px 6px; border-radius: 4px; }
+.relevance-pill.play_evidence { color: #05261a; background: var(--ok); }
+.relevance-pill.general_chatter { color: var(--text-2); background: var(--panel-2); border: 1px solid var(--line-2); }
+.social-posts { list-style: none; margin: 0; padding: 4px 14px 12px; display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; }
+.social-post { padding: 8px 10px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--line); font-size: 12px; }
+.social-post p { margin: 4px 0; color: var(--text); line-height: 1.4; overflow-wrap: anywhere; }
+.social-post-meta, .social-post-foot { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-2); }
+.social-post-foot { justify-content: space-between; }
+.social-post a { color: var(--accent); }
+.social-empty { padding: 8px 14px 12px; font-size: 12px; }

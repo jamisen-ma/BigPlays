@@ -15,9 +15,11 @@ Endpoints
 import asyncio
 import json
 import time
+from datetime import datetime
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncIterator, List, Optional
+from zoneinfo import ZoneInfo
 
 import orjson
 from fastapi import FastAPI, Request
@@ -28,11 +30,16 @@ from fastapi.staticfiles import StaticFiles
 from bigplays.config import settings
 from bigplays.server.events import bus
 from bigplays.server.streams import router as streams_router, stop_recording
+from bigplays.server.agent import router as agent_router
+from bigplays.server.social import router as social_router
+from bigplays.server.games import router as games_router
+from bigplays.storage.catalog import catalog_for
 
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
 _sim = None  # DemoSimulator when demo mode is on
-_seen_sidecars: set[str] = set()
+_seen_sidecars: dict[str, int] = {}
+_mlb_error: str | None = None
 
 
 def _json_response(data):
@@ -41,39 +48,89 @@ def _json_response(data):
 
 def load_highlights() -> List[dict]:
     clips_dir = settings.clips_dir
+    catalog = catalog_for(clips_dir, settings.database_path)
+    catalog.migrate_sidecars(clips_dir)
     items: List[dict] = []
-    for meta in clips_dir.glob("*.json"):
+    for data in catalog.all():
+        if not visible_highlight(data):
+            continue
+        if not data.get("file") or not (clips_dir / data["file"]).exists():
+            data["file"] = None
+        items.append(data)
+    return items
+
+
+def visible_highlight(record: dict) -> bool:
+    return (not settings.demo_mode or settings.demo_dataset == 'highlights'
+            or record.get('replay_dataset') == settings.demo_dataset
+            or record.get('league') == 'mlb')
+
+
+def mlb_status() -> dict:
+    date = datetime.now(ZoneInfo('America/Los_Angeles')).date().isoformat()
+    reports = catalog_for(settings.clips_dir, settings.database_path).imports()
+    report = reports.get(f'mlb-{date}', {})
+    return {'date': date, 'games': report.get('games', []),
+            'enabled': settings.mlb_highlights_enabled, 'checked_at': report.get('checked_at'),
+            'error': _mlb_error, 'poll_seconds': settings.mlb_highlights_poll_seconds}
+
+
+def saved_mlb_games() -> list[dict]:
+    return mlb_status()['games']
+
+
+def game_list() -> list[dict]:
+    return _sim.game_list() if _sim else saved_mlb_games()
+
+
+async def _watch_mlb() -> None:
+    """Collect newly published official clips without depending on a live TV stream."""
+    global _mlb_error
+    from bigplays.ingest.mlb_archive import import_date
+    while True:
+        try:
+            date = datetime.now(ZoneInfo('America/Los_Angeles')).date().isoformat()
+            await asyncio.to_thread(import_date, date)
+            _mlb_error = None
+            bus.publish('game_tick', {'games': game_list()})
+        except Exception as error:
+            _mlb_error = f'MLB highlights check failed: {type(error).__name__}'
+            bus.publish('log', {'level': 'error', 'msg': _mlb_error})
+        await asyncio.sleep(settings.mlb_highlights_poll_seconds)
+
+
+def changed_highlights(seen):
+    changes = []
+    for meta in settings.clips_dir.glob('*.json'):
+        stamp = meta.stat().st_mtime_ns
+        if seen.get(meta.name) == stamp:
+            continue
         try:
             data = orjson.loads(meta.read_bytes())
         except Exception:
             continue
-        data.setdefault("file", meta.with_suffix(".mp4").name)
-        if not (clips_dir / data["file"]).exists():
-            data["file"] = None
-        poster = meta.with_suffix(".jpg")
-        data.setdefault("poster", poster.name if poster.exists() else None)
-        items.append(data)
-    items.sort(key=lambda d: d.get("occurred_utc", ""), reverse=True)
-    return items
+        event = 'highlight_update' if meta.name in seen else 'highlight'
+        seen[meta.name] = stamp
+        data.setdefault('file', meta.with_suffix('.mp4').name)
+        if data.get('event_id'):
+            catalog_for(settings.clips_dir, settings.database_path).upsert(data)
+        changes.append((event, data))
+    return changes
 
 
 async def _watch_clips_dir() -> None:
     """Publish highlights written by an external agent process (real pipeline)."""
     global _seen_sidecars
-    _seen_sidecars = {p.name for p in settings.clips_dir.glob("*.json")}
+    _seen_sidecars = {p.name: p.stat().st_mtime_ns for p in settings.clips_dir.glob("*.json")}
     while True:
         await asyncio.sleep(2.0)
         try:
-            for meta in settings.clips_dir.glob("*.json"):
-                if meta.name in _seen_sidecars or (_sim and meta.name in _sim.seen_files):
+            for event, data in changed_highlights(_seen_sidecars):
+                if not visible_highlight(data):
                     continue
-                _seen_sidecars.add(meta.name)
-                try:
-                    data = orjson.loads(meta.read_bytes())
-                except Exception:
+                if _sim and data.get('demo') and not data.get('imported'):
                     continue
-                data.setdefault("file", meta.with_suffix(".mp4").name)
-                bus.publish("highlight", data)
+                bus.publish(event, data)
         except Exception as ex:
             bus.publish("log", {"level": "error", "msg": f"watcher: {ex}"})
 
@@ -82,29 +139,40 @@ async def _watch_clips_dir() -> None:
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     global _sim
     settings.clips_dir.mkdir(parents=True, exist_ok=True)
+    catalog_for(settings.clips_dir, settings.database_path).migrate_sidecars(settings.clips_dir)
     bus.bind_loop(asyncio.get_running_loop())
     watcher = asyncio.create_task(_watch_clips_dir())
+    mlb_watcher = asyncio.create_task(_watch_mlb()) if settings.mlb_highlights_enabled else None
     if settings.demo_mode:
         from bigplays.demo.simulator import DemoSimulator
 
         _sim = DemoSimulator(
             bus, settings.clips_dir, settings.demo_clips_dir,
             min_interval=settings.demo_min_interval, max_interval=settings.demo_max_interval,
+            league=settings.demo_league,
+            dataset=settings.demo_dataset,
+            database_path=settings.database_path,
         )
-        removed = _sim.purge_previous()
+        _sim.extra_games = saved_mlb_games
         _sim.start()
-        bus.publish("log", {"level": "info", "msg": f"demo simulator started (purged {removed} old demo clips)"})
+        bus.publish("log", {"level": "info", "msg": "Replay started; saved highlights restored from SQLite"})
     try:
         yield
     finally:
         watcher.cancel()
+        if mlb_watcher:
+            mlb_watcher.cancel()
         await stop_recording()
         if _sim:
             _sim.stop()
+            _sim = None
 
 
 app = FastAPI(title="BigPlays", lifespan=lifespan)
+app.include_router(games_router)  # before the legacy /api/games route so the contract endpoint wins
 app.include_router(streams_router)
+app.include_router(agent_router)
+app.include_router(social_router)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 settings.clips_dir.mkdir(parents=True, exist_ok=True)
@@ -115,11 +183,16 @@ app.mount("/clips", StaticFiles(directory=str(settings.clips_dir)), name="clips"
 def api_status():
     return _json_response({
         "mode": "demo" if settings.demo_mode else "live",
+        "demo_league": settings.demo_league if settings.demo_mode else None,
+        "demo_dataset": settings.demo_dataset if settings.demo_mode else None,
         "leagues": settings.leagues,
         "use_llm": settings.use_llm,
         "llm_model": settings.llm_model,
         "s3": {"enabled": settings.enable_s3, "bucket": settings.s3_bucket, "prefix": settings.s3_prefix},
         "highlights": len(load_highlights()),
+        "catalog": {"storage": "sqlite", "persistent": True,
+                    "imports": catalog_for(settings.clips_dir, settings.database_path).imports()},
+        "mlb": mlb_status(),
         "server_time": time.time(),
     })
 
@@ -131,7 +204,12 @@ def api_highlights():
 
 @app.get("/api/games")
 def api_games():
-    return _json_response(_sim.game_list() if _sim else [])
+    return _json_response(game_list())
+
+
+@app.get('/api/mlb/games')
+def api_mlb_games():
+    return _json_response(mlb_status())
 
 
 @app.post("/api/demo/next")
@@ -154,8 +232,8 @@ async def api_stream(request: Request):
         try:
             yield _sse("hello", {
                 "mode": "demo" if settings.demo_mode else "live",
-                "games": _sim.game_list() if _sim else [],
-                "recent": load_highlights()[:30],
+                "games": game_list(),
+                "recent": load_highlights(),
                 "pipeline": [e.data | {"ts": e.ts} for e in bus.recent(["pipeline"], 40)],
             })
             while True:
@@ -181,6 +259,8 @@ if FRONTEND_DIST.exists():
 
 @app.get("/{full_path:path}")
 def spa(full_path: str):
+    if full_path == 'api' or full_path.startswith('api/'):
+        return JSONResponse({'ok': False, 'error': 'Not found'}, status_code=404)
     index = FRONTEND_DIST / "index.html"
     if index.exists():
         candidate = FRONTEND_DIST / full_path

@@ -1,0 +1,81 @@
+name: bigplays-cloud
+
+x-service: &service
+  restart: unless-stopped
+  init: true
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '3'
+
+x-runtime: &runtime
+  <<: *service
+  image: bigplays-runtime:local
+  build:
+    context: .
+    target: runtime
+  env_file: cloud.env
+  environment:
+    DEMO_MODE: 'false'
+    RESOLVER_BASE_URL: http://resolver:3000
+    OLLAMA_BASE_URL: http://ollama:11434
+    SCOREBOARD_OCR_BIN: tesseract
+    AGENT_DIR: /data/agent
+    CLIPS_DIR: /data/clips
+    BUFFER_DIR: /data/buffer
+    DEMO_CLIPS_DIR: /data/demo_clips
+  volumes:
+    - footage:/data
+  depends_on:
+    resolver:
+      condition: service_healthy
+
+services:
+  resolver:
+    <<: *service
+    build:
+      context: .
+      target: resolver
+    environment:
+      RESOLVER_API_KEY: ${RESOLVER_API_KEY:?Set a random key of at least 32 characters in cloud.env}
+      RESOLVER_EMBED_HOSTS: ${RESOLVER_EMBED_HOSTS:?Set approved embed hosts in cloud.env}
+      RESOLVER_MEDIA_HOSTS: ${RESOLVER_MEDIA_HOSTS:?Set approved media hosts in cloud.env}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/stream').then(r=>process.exit(r.status===405?0:1)).catch(()=>process.exit(1))"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+
+  app:
+    <<: *runtime
+    # Access through an SSH tunnel; add authenticated HTTPS before public exposure.
+    ports:
+      - '127.0.0.1:${BIGPLAYS_PORT:-8000}:8000'
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/status', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  agent:
+    <<: *runtime
+    command: [python, -m, bigplays.orchestrator.live_agent]
+    stop_grace_period: 45s
+    healthcheck:
+      test: [CMD, python, -c, "import json,time; from pathlib import Path; from datetime import datetime; d=json.loads(Path('/data/agent/status.json').read_text()); assert 0 <= time.time()-datetime.fromisoformat(d['heartbeat']).timestamp() < 90"]
+      start_period: 60s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ollama:
+    <<: *service
+    image: ollama/ollama:latest
+    profiles: [local-llm]
+    volumes:
+      - models:/root/.ollama
+
+volumes:
+  footage:
+  models:

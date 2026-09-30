@@ -48,6 +48,7 @@ export function YouTubePlayer({ videoId, start = 0, end, onError }: {
   useEffect(() => {
     let cancelled = false
     let poll: number | undefined
+    const timeout = window.setTimeout(() => onErrorRef.current?.(-1), 15000)
     const el = document.createElement('div')
     host.current?.appendChild(el)
     setReady(false); setPlaying(false); setT(0); setDur(0)
@@ -78,6 +79,7 @@ export function YouTubePlayer({ videoId, start = 0, end, onError }: {
           },
           onError: (e: any) => onErrorRef.current?.(Number(e.data)),
           onStateChange: (e: any) => {
+            if (e.data === YT.PlayerState.PLAYING) window.clearTimeout(timeout)
             setPlaying(e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING)
             if (e.data === YT.PlayerState.ENDED) { e.target.seekTo(start, true); e.target.playVideo() }
           },
@@ -86,6 +88,7 @@ export function YouTubePlayer({ videoId, start = 0, end, onError }: {
     })
     return () => {
       cancelled = true
+      window.clearTimeout(timeout)
       if (poll) window.clearInterval(poll)
       try { player.current?.destroy() } catch { /* ignore */ }
       player.current = null
@@ -112,7 +115,7 @@ export function YouTubePlayer({ videoId, start = 0, end, onError }: {
       <div className="clip-crop"><div className="yt-host" ref={host} /></div>
       <div className="clip-mask-top" />
       <div className="clip-shield" onClick={toggle} />
-      {!ready && <div className="clip-loading"><span className="spinner" /> cutting clip from buffer…</div>}
+      {!ready && <div className="clip-loading"><span className="spinner" /> loading highlight…</div>}
       <div className="clip-bar">
         <button onClick={toggle} title={playing ? 'Pause' : 'Play'}>{playing ? '❚❚' : '▶'}</button>
         <button onClick={replay} title="Replay">↺</button>

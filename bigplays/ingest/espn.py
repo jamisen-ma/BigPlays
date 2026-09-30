@@ -12,6 +12,11 @@ from bigplays.utils.time_utils import parse_espn_timestamp
 
 NBA_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
 NFL_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
+MLB_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard"
+# ESPN falls back to 25 events for an oversized limit; 100 returns the full FBS slate.
+NCAAF_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?groups=80&limit=100"
+SCOREBOARDS = {League.NBA: NBA_SCOREBOARD, League.NFL: NFL_SCOREBOARD, League.NCAAF: NCAAF_SCOREBOARD,
+              League.MLB: MLB_SCOREBOARD}
 
 
 @dataclass
@@ -24,10 +29,16 @@ class GameState:
     away_score: int
     status: str  # pre, in, post
     last_update: Optional[datetime]
+    inning: Optional[int] = None
+    inning_half: Optional[str] = None
+    balls: Optional[int] = None
+    strikes: Optional[int] = None
+    outs: Optional[int] = None
+    status_detail: str = ''
 
 
 def fetch_scoreboard(league: League) -> dict:
-    url = NBA_SCOREBOARD if league == League.NBA else NFL_SCOREBOARD
+    url = SCOREBOARDS[league]
     resp = requests.get(url, timeout=10)
     resp.raise_for_status()
     return resp.json()
@@ -49,6 +60,10 @@ def parse_games(league: League, data: dict) -> List[GameState]:
         if not home or not away:
             continue
         status = ev.get("status", {}).get("type", {}).get("state", "pre").lower()
+        details = ev.get('status', {})
+        situation = comp.get('situation', {})
+        status_detail = details.get('type', {}).get('shortDetail', '')
+        half = next((half for half in ('Top', 'Bottom') if status_detail.lower().startswith(half.lower())), None)
         game_id = ev.get("id")
         results.append(
             GameState(
@@ -60,6 +75,12 @@ def parse_games(league: League, data: dict) -> List[GameState]:
                 away_score=int(away.get("score", 0)),
                 status=status,
                 last_update=parse_espn_timestamp(ev.get("date")) if ev.get("date") else None,
+                inning=details.get('period') if league == League.MLB and status != 'pre' else None,
+                inning_half=half if league == League.MLB else None,
+                balls=situation.get('balls') if league == League.MLB else None,
+                strikes=situation.get('strikes') if league == League.MLB else None,
+                outs=situation.get('outs') if league == League.MLB else None,
+                status_detail=status_detail,
             )
         )
     return results
@@ -88,4 +109,3 @@ def poll_scoreboards(leagues: List[League]) -> Generator[List[GameState], None, 
     payloads = {league: fetch_scoreboard(league) for league in leagues}
     games = {league: parse_games(league, payloads[league]) for league in leagues}
     yield [g for lst in games.values() for g in lst]
-
