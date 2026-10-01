@@ -1,19 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Game, Highlight, LogLine, PipelineEvent, Stage } from './types'
-
-export interface CurrentPipeline {
-  play_id: string
-  stages: Partial<Record<Stage, PipelineEvent>>
-  startedAt: number
-  finished: boolean
-}
+import type { Game, Highlight, LogLine } from './types'
 
 export interface LiveState {
   connected: boolean
-  mode: 'demo' | 'live' | null
   games: Game[]
   highlights: Highlight[]
-  pipeline: CurrentPipeline | null
   logs: LogLine[]
   lastArrival: Highlight | null
 }
@@ -40,7 +31,7 @@ export function mergeHistory(current: Highlight[], recent: Highlight[]): Highlig
 
 export function useLiveFeed() {
   const [state, setState] = useState<LiveState>({
-    connected: false, mode: null, games: [], highlights: [], pipeline: null, logs: [], lastArrival: null,
+    connected: false, games: [], highlights: [], logs: [], lastArrival: null,
   })
   const logId = useRef(0)
 
@@ -61,7 +52,7 @@ export function useLiveFeed() {
         // On a reconnect, clips that landed while we were disconnected are real arrivals too.
         const known = new Set(s.highlights.map(h => h.event_id))
         const missed = s.highlights.length ? highlights.find(h => !known.has(h.event_id)) : undefined
-        return { ...s, mode: d.mode, games: d.games ?? [], highlights, connected: true, lastArrival: missed ?? s.lastArrival }
+        return { ...s, games: d.games ?? [], highlights, connected: true, lastArrival: missed ?? s.lastArrival }
       })
       log('info', `connected · mode=${d.mode} · ${d.recent?.length ?? 0} highlights on disk`)
     })
@@ -71,34 +62,20 @@ export function useLiveFeed() {
       setState(s => ({ ...s, games: d.games ?? [] }))
     })
 
-    es.addEventListener('pipeline', (e) => {
-      const d = JSON.parse((e as MessageEvent).data) as PipelineEvent
-      setState(s => {
-        const cur = s.pipeline && s.pipeline.play_id === d.play_id && !s.pipeline.finished
-          ? s.pipeline
-          : { play_id: d.play_id, stages: {}, startedAt: d.ts, finished: false }
-        const next: CurrentPipeline = { ...cur, stages: { ...cur.stages, [d.stage]: d } }
-        return { ...s, pipeline: next }
-      })
-      if (d.status === 'running') log('stage', `[${d.stage}] ${d.detail}`, d.ts)
-    })
-
     es.addEventListener('highlight', (e) => {
       const h = JSON.parse((e as MessageEvent).data) as Highlight
       if (!h?.event_id) return
       setState(s => {
         const known = s.highlights.some(x => x.event_id === h.event_id)
-        // Demo replays intentionally re-fire saved plays, so they move to the top again.
-        // Anything else we have already seen (e.g. a replayed event after reconnect) is
+        // Anything we have already seen (e.g. a replayed event after reconnect) is
         // refreshed in place rather than duplicated or re-announced.
-        if (known && !h.demo) {
+        if (known) {
           return { ...s, highlights: s.highlights.map(old => old.event_id === h.event_id ? { ...old, ...h } : old) }
         }
         return {
           ...s,
           highlights: [h, ...s.highlights.filter(old => old.event_id !== h.event_id)],
           lastArrival: h,
-          pipeline: s.pipeline ? { ...s.pipeline, finished: true } : s.pipeline,
         }
       })
     })
@@ -125,9 +102,5 @@ export function useLiveFeed() {
     if (arrival) log('highlight', `VIRAL · ${arrival.title} (hype ${(arrival.llm?.hype_score ?? arrival.combined_score ?? 0).toFixed(2)})`, arrival.ts)
   }, [arrival, log])
 
-  const fireNext = useCallback(async () => {
-    await fetch('/api/demo/next', { method: 'POST' })
-  }, [])
-
-  return { ...state, fireNext }
+  return state
 }

@@ -160,7 +160,6 @@ export interface Highlight {
   date?: string
   series_description?: string
   source_kind?: SourceKind | null
-  demo?: boolean
   imported?: boolean
   file: string | null
   poster?: string | null

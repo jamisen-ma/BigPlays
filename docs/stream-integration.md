@@ -135,8 +135,7 @@ No previous `.env` existed or was overwritten. For a fresh checkout, copy
 | `RESOLVER_API_KEY` | Same random secret of at least 32 characters in Node and FastAPI |
 | `RESOLVER_EMBED_HOSTS` | Exact approved embed hosts; observed `embedindia.st` |
 | `RESOLVER_MEDIA_HOSTS` | Exact approved playlist/segment/key hosts, comma-separated |
-| `DEMO_MODE` | `false` |
-| `LEAGUES` | `["nba","nfl","ncaaf"]`; also enables CFB in the legacy scoreboard agent |
+| `LEAGUES` | `["nba","nfl","ncaaf"]` |
 | `BUFFER_DIR`, `CLIPS_DIR` | Persistent writable media paths; default `data/buffer`, `data/clips` |
 | `AGENT_DIR` | Agent state and timestamped archives; default `data/agent` |
 | `AGENT_MAX_GAMES` | Concurrent automatic game archives; default `2`, maximum `8` |
@@ -201,8 +200,7 @@ league, visible under All. The CFB highlight filter uses the `ncaaf` league.
 
 The manual recorder supports one game independently of the background agent's
 separate per-game archives. Use the background monitor for automatic selection,
-switching and timestamp-aligned plays. Do not run the old scoreboard-only CLI
-against these archives; its polling-time alignment is obsolete. The legacy CLI
+switching and timestamp-aligned plays. The legacy CLI
 `ppv resolve` / `ppv record` still uses its old HTML resolver; use the dashboard
 for the integrated Node path.
 

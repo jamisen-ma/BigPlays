@@ -6,7 +6,6 @@ __pycache__/
 .env
 cloud.env
 data/
-!bigplays/demo/data/
 frontend/node_modules/
 frontend/dist/
 .claude/

@@ -31,7 +31,6 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, 'clips_dir', tmp_path / 'clips')
     monkeypatch.setattr(settings, 'database_path', tmp_path / 'lifespan.sqlite3')
     monkeypatch.setattr(settings, 'mlb_highlights_enabled', False)
-    monkeypatch.setattr(settings, 'demo_mode', False)
     with TestClient(app_module.app) as c:
         yield c
 

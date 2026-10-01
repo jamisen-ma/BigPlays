@@ -41,8 +41,6 @@ def source_kind_of(record: dict) -> str:
     kind = record.get('source_kind')
     if kind in SOURCE_KINDS:
         return kind
-    if record.get('demo'):
-        return 'replay'
     if record.get('imported'):
         return 'official_upload'
     return 'live_capture'

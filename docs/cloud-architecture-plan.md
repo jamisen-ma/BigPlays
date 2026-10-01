@@ -85,7 +85,7 @@ likely to be the largest line item.
 | Clip cut | `bigplays/media/hls_clipper.py` tries a stream copy first and falls back to `libx264 veryfast crf 20` | Low CPU. The output lands in `CLIPS_DIR`. |
 | OCR | `bigplays/media/scoreboard.py`: `frame_clock()` uses either the Swift/Vision binary (`scripts/scoreboard_ocr.swift`) or `tesseract` (`tesseract_rows()` normalizes to Vision coordinates). Tested by `tests/test_linux_scoreboard.py`. | Linux path exists; accuracy on each broadcaster's scorebug is not yet verified |
 | Library | `ClipLibrary` in `bigplays/storage/local_store.py` writes MP4 + JPG + a JSON sidecar and upserts into `HighlightCatalog` (`bigplays/storage/catalog.py`, SQLite, a `payload` JSON column keyed by `event_id`) | Local disk and SQLite |
-| S3 | `bigplays/storage/s3_store.py` (flat `prefix + filename` keys, used only by legacy `main.py` `_upload_if_enabled`). `ENABLE_S3` does nothing in the live agent. | Needs a real media store abstraction |
+| S3 | No S3 code today (the unused `s3_store.py` was removed). `ENABLE_S3` does nothing in the live agent. | Needs a real media store abstraction |
 | Stream source | `bigplays/ingest/live_streams.py` + `ppv_provider.py` + Node `ppv-hls-stream-resolver/` (WASM decrypt, `impit` Chrome-TLS relay) | **Legal blocker for public use** (section 9). Datacenter IPs may also be blocked. |
 | Official MLB | `bigplays/ingest/mlb_archive.py` pulls from the MLB Stats API and downloads official MP4s into `CLIPS_DIR` | MLBAM terms allow only non-commercial use |
 | Play-by-play | ESPN's undocumented `site.api.espn.com` (`ingest/espn.py`, `ingest/plays.py`) | Unofficial API with no license and no SLA |
@@ -291,7 +291,6 @@ s3://bigplays-media-<env>/
   clips/v1/<league>/<season>/<game_id>/<event_id>/r<rev>/mobile.mp4     # 720p H.264/AAC, ~2.5 Mbps
   clips/v1/<league>/<season>/<game_id>/<event_id>/r<rev>/poster.jpg     # full size
   clips/v1/<league>/<season>/<game_id>/<event_id>/r<rev>/poster-480.jpg
-  datasets/<dataset>/<file>                                              # demo_clips, nfl-week3 replay sets
   debug/ocr-frames/<game_key>/<epoch>.jpg                                # lifecycle: expire 7 days
   backups/postgres/<date>/...  and  backups/sqlite/<date>/clips.sqlite3  # lifecycle: 90 days
   legacy/data-clips/<original filename>                                  # one-time raw copy for audit
@@ -460,8 +459,6 @@ and `docs/cloud.md`. Remaining work:
    4. Copy `import_runs`.
    5. Report orphans: files without rows and rows without files. `data/clips`
       has 1,258 files for 431 rows (MP4 + JSON + JPG).
-   6. Upload `data/demo_clips` and `data/nfl-week3` under `datasets/`, but only
-      if you keep those datasets.
 
    At 5.8 GB this finishes in minutes. `rclone copy` or `aws s3 sync` of
    `data/clips` into `legacy/` makes a useful raw audit copy.
@@ -563,7 +560,7 @@ and `docs/cloud.md`. Remaining work:
    `identityToken` (RS256, Apple JWKS at `https://appleid.apple.com/auth/keys`,
    `iss`, `aud` = bundle ID, `exp`, nonce). It upserts `users.apple_sub` and
    issues app access JWTs (15 min) and refresh tokens (rotating, stored hashed).
-   It also adds an admin role for the agent, recording and demo routes. Replace
+   It also adds an admin role for the agent and recording routes. Replace
    `allow_origins=["*"]` in `server/app.py` with the dashboard origin.
 3. **Push.** Add `bigplays/notify/apns.py` and a `notifier` service:
    - It listens for new `published` highlights, selects devices from `follows`,

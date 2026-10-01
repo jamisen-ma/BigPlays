@@ -6,9 +6,11 @@ import type { Highlight } from '../types'
 
 describe('sourceKindOf / sourceLabel', () => {
   it('prefers explicit source_kind, then infers', () => {
-    expect(sourceKindOf({ source_kind: 'official_upload', demo: true })).toBe('official_upload')
-    expect(sourceKindOf({ demo: true })).toBe('replay')
+    expect(sourceKindOf({ source_kind: 'live_capture', imported: true })).toBe('live_capture')
     expect(sourceKindOf({ imported: true })).toBe('official_upload')
+    // Old NFL.com imports still carry demo: true from the retired replay mode; they are official uploads.
+    const legacyImport = { demo: true, imported: true }
+    expect(sourceKindOf(legacyImport)).toBe('official_upload')
     expect(sourceKindOf({})).toBe('live_capture')
     expect(sourceKindOf({ source_kind: 'bogus' as never })).toBe('live_capture')
   })

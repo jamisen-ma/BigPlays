@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    # extra="ignore": keys an old .env still has but the app no longer reads are skipped, not errors.
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # Core
@@ -43,14 +44,6 @@ class Settings(BaseSettings):
     enable_s3: bool = Field(default=False, alias="ENABLE_S3")
     s3_bucket: str | None = Field(default=None, alias="S3_BUCKET")
     s3_prefix: str = Field(default="highlights/", alias="S3_PREFIX")
-
-    # Demo mode (replays scripted plays with synthetic clips when no live games exist)
-    demo_mode: bool = Field(default=False, alias="DEMO_MODE")
-    demo_league: Literal['all', 'nba', 'nfl'] = Field(default='all', alias='DEMO_LEAGUE')
-    demo_dataset: Literal['highlights', 'nfl-2026-week3'] = Field(default='highlights', alias='DEMO_DATASET')
-    demo_clips_dir: Path = Field(default=Path("data/demo_clips"), alias="DEMO_CLIPS_DIR")
-    demo_min_interval: float = Field(default=7.0, alias="DEMO_MIN_INTERVAL")
-    demo_max_interval: float = Field(default=14.0, alias="DEMO_MAX_INTERVAL")
 
     # Server
     server_host: str = Field(default="0.0.0.0", alias="SERVER_HOST")

@@ -68,7 +68,6 @@ def test_resolver_failure_stage_preserved(monkeypatch):
 ])
 def test_recording_carries_game_to_clip_and_clears_on_stop(monkeypatch, tmp_path, game):
     monkeypatch.setattr(streams.settings, 'resolver_api_key', 'test-secret')
-    monkeypatch.setattr(streams.settings, 'demo_mode', False)
     original = httpx.AsyncClient
     transport = httpx.MockTransport(lambda r: httpx.Response(200, json={
         'ok': True, 'proxiedUrl': '/api/hls?sig=test'}))

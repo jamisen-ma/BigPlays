@@ -15,10 +15,11 @@ def clip(event_id, tmp_path=None, **kw):
 
 
 def test_source_kind_derivation():
-    assert source_kind_of({'demo': True, 'imported': True}) == 'replay'
+    # Old NFL.com imports still carry demo=True from the retired replay mode; they are official uploads.
+    assert source_kind_of({'demo': True, 'imported': True}) == 'official_upload'
     assert source_kind_of({'imported': True}) == 'official_upload'
     assert source_kind_of({}) == 'live_capture'
-    assert source_kind_of({'demo': True, 'source_kind': 'live_capture'}) == 'live_capture'
+    assert source_kind_of({'imported': True, 'source_kind': 'live_capture'}) == 'live_capture'
     assert source_kind_of({'source_kind': 'bogus', 'imported': True}) == 'official_upload'
 
 
@@ -53,7 +54,7 @@ def test_unmatched_never_time_matched(tmp_path):
 def test_multi_clip_selection_prefers_live_then_social_then_latest(tmp_path):
     plays = [play('P01'), play('P02'), play('P03')]
     clips = [
-        clip('replay_hi', source_play_id='P01', demo=True, social_score=0.99),
+        clip('replay_hi', source_play_id='P01', source_kind='replay', social_score=0.99),
         clip('live', source_play_id='P01'),
         clip('official_lo', source_play_id='P02', imported=True, social_score=0.2),
         clip('official_hi', source_play_id='P02', imported=True, social_score=0.8),

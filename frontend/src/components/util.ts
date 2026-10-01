@@ -65,13 +65,11 @@ export function posterUrl(h: Highlight): string | undefined {
 
 /**
  * Provenance of a clip. Prefer the backend's explicit `source_kind`; otherwise infer it:
- * - demo-dataset records (demo: true, e.g. replay_dataset "nfl-2026-week3") are replays;
- * - other imported records (official MLB/NFL uploads pulled after the fact) are official uploads;
+ * - imported records (official MLB/NFL uploads pulled after the fact) are official uploads;
  * - anything else was cut by our own pipeline from the continuous stream buffer.
  */
-export function sourceKindOf(h: Pick<Highlight, 'source_kind' | 'demo' | 'imported'>): SourceKind {
+export function sourceKindOf(h: Pick<Highlight, 'source_kind' | 'imported'>): SourceKind {
   if (h.source_kind && SOURCE_KINDS.includes(h.source_kind)) return h.source_kind
-  if (h.demo) return 'replay'
   if (h.imported) return 'official_upload'
   return 'live_capture'
 }
@@ -84,6 +82,6 @@ export function sourceLabel(kind: SourceKind, league?: string): string {
 
 export const SOURCE_DESCRIPTION: Record<SourceKind, string> = {
   live_capture: 'Cut from our own continuous live buffer',
-  replay: 'Replay from the demo dataset',
+  replay: 'Replay of archived footage',
   official_upload: 'Official highlight imported after publication',
 }

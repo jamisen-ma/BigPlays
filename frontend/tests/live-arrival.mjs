@@ -6,7 +6,7 @@
 //  - a genuinely new live clip arriving over SSE shows at the top without a page reload;
 //  - EventSource reconnects (each resends `hello` + a replayed `highlight`) never duplicate it;
 //  - after a browser reload the clip is still present exactly once and still on top;
-//  - provenance badges/filter (LIVE CAPTURE / NFL REPLAY / OFFICIAL UPLOAD);
+//  - provenance badges/filter (LIVE CAPTURE / OFFICIAL UPLOAD, including an old NFL.com import);
 //  - MLB inning/count/outs + distinct event / publication / import times, and
 //    "Event time unavailable" when the event time is missing;
 //  - the social panel with a working endpoint and with a 404.
@@ -36,16 +36,17 @@ const clip = (over) => ({
   game_id: 'g1', league: 'nfl', title: 'Clip', description: '', reasons: [], base_score: .6, combined_score: .6, tags: [],
   file: null, poster: null, away: 'KC', home: 'BUF', away_score: 7, home_score: 3, period: 'Q2', clock: '4:12', ...over,
 })
+// An old NFL.com import: it still carries demo: true from the retired replay mode and must show as an official upload.
 const replay = clip({ event_id: 'nfl-replay-1', title: 'Replay touchdown', demo: true, imported: true, replay_dataset: 'nfl-2026-week3',
   occurred_utc: '2026-09-21T20:14:03Z', published_utc: '2026-09-21T20:40:00Z', received_utc: iso(7200) })
-const mlbUpload = clip({ event_id: 'mlb-upload-1', game_id: 'm1', league: 'mlb', title: 'Murakami single', demo: false, imported: true,
+const mlbUpload = clip({ event_id: 'mlb-upload-1', game_id: 'm1', league: 'mlb', title: 'Murakami single', imported: true,
   replay_dataset: 'mlb-2026-09-29', away: 'CWS', home: 'HOU', away_score: 5, home_score: 2, period: 'Top 7', clock: '',
   inning: 7, inning_half: 'top', balls: 1, strikes: 0, outs: 0, count_context: 'before pitch',
   occurred_utc: '2026-09-29T23:17:23.104Z', published_utc: '2026-09-30T00:26:14.345Z', received_utc: '2026-09-30T00:27:58.476Z',
   timestamp_source: 'MLB play event startTime', source: { channel: 'MLB', url: 'https://www.mlb.com/video/x' } })
 const mlbNoTime = clip({ ...mlbUpload, event_id: 'mlb-upload-2', title: 'Unmatched homer', occurred_utc: null, timestamp_source: null,
   inning: 3, inning_half: 'bottom', balls: 3, strikes: 2, outs: 2, count_context: undefined })
-const live = clip({ event_id: 'live-capture-1', title: 'LIVE: 62-yard strike', demo: false, source_kind: 'live_capture',
+const live = clip({ event_id: 'live-capture-1', title: 'LIVE: 62-yard strike', source_kind: 'live_capture',
   occurred_utc: iso(40), received_utc: iso(5), ts: Date.now() / 1000 - 5, llm: { verdict: true, hype_score: .93, tags: [], title: '', rationale: 'x' } })
 
 // Mock backend state. `recent` is what a fresh hello returns (newest first, like the catalog).
@@ -114,10 +115,12 @@ try {
   assert.deepEqual(await ids(page), ['nfl-replay-1', 'mlb-upload-1', 'mlb-upload-2'], 'reconnects must not duplicate history')
 
   // provenance badges and filter
-  assert.equal(await page.locator('[data-event-id="nfl-replay-1"] .source-pill').textContent(), 'NFL REPLAY')
+  assert.equal(await page.locator('[data-event-id="nfl-replay-1"] .source-pill').textContent(), 'OFFICIAL UPLOAD')
   assert.equal(await page.locator('[data-event-id="mlb-upload-1"] .source-pill').textContent(), 'OFFICIAL UPLOAD')
   await page.getByLabel('Filter by source').selectOption('official_upload')
-  assert.deepEqual(await ids(page), ['mlb-upload-1', 'mlb-upload-2'])
+  assert.deepEqual(await ids(page), ['nfl-replay-1', 'mlb-upload-1', 'mlb-upload-2'])
+  await page.getByLabel('Filter by source').selectOption('live_capture')
+  assert.deepEqual(await ids(page), [])
   await page.getByLabel('Filter by source').selectOption('all')
 
   // MLB state + distinct timestamps
