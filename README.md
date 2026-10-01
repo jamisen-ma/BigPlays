@@ -49,6 +49,54 @@ Reddit game thread (RSS) ──► hype score ──► local LLM (qwen3:4b) ─
   play-by-play. `bigplays/storage/play_links.py` attaches clips to plays by ESPN
   play ID and never by time.
 
+## How viral plays are picked
+
+Every play goes through up to four checks. A play has to get through them all to
+show up as a viral clip.
+
+1. **Is it a big play at all?** From ESPN's play-by-play:
+   - **MLB:** hits, scoring plays, strikeouts, and defensive plays (double plays,
+     caught stealing, pickoffs).
+   - **NFL:** touchdowns, field goals, turnovers, and gains of 20+ yards.
+
+   Everything else, like routine groundouts or short runs, is ignored. Plays that
+   pass get clipped right away and held, so the clip is ready the moment it's
+   approved.
+2. **Is it can't-miss?** Home runs, grand slams, walk-offs, go-ahead or tying runs
+   in the 7th inning or later, touchdowns, interceptions and lost fumbles publish
+   immediately. No waiting on fans.
+3. **Are fans losing it?** For everything else, BigPlays reads the Reddit game
+   thread from just before the play to 30 seconds after it airs and scores the
+   reaction:
+   - ALL-CAPS comments and stretched-out words like "OMGGGG" or "NOOOO"
+   - "!!!", hype phrases ("WHAT A", "LFG", "HE GONE"), team cheers like "LFGSD", and 🔥😱
+   - mentions of the player or team
+   - **a burst:** how many more comments per minute than the thread's normal pace
+     over the last 10 minutes. A spike means something just happened.
+
+   A low score means the clip is skipped.
+4. **Does the AI agree?** If the score is high enough, up to 25 of those comments
+   (text only, no usernames) go to a local LLM (`qwen3:4b` in Ollama). It decides
+   whether fans are hyped about *this* play, or about something else like a pitching
+   change or an earlier moment. On a "yes" the clip publishes instantly, with a few
+   fan quotes attached.
+
+**Safety nets.**
+- **Skipped clips** stay hidden for 6 hours, in case you want to publish one by
+  hand.
+- **Reddit unavailable** (no thread found, or rate-limited): the clip publishes
+  anyway after about 90 seconds, so nothing is lost.
+- **Switching the filter:** `SOCIAL_CLIP_GATE=off` turns the fan check off and
+  clips every play that passes step 1.
+
+Example from the CHC@SD Wild Card game:
+
+| Play | Fan score | AI | Result |
+|---|---|---|---|
+| Conforto strikes out to end the game | 0.87, comments at 3.9× normal pace | viral | published |
+| Suzuki singles in the 9th | 0.23 | not asked | skipped |
+| Busch strikes out | 0.76 | not viral (fans were talking about the pitcher's return) | skipped |
+
 **Measured on 2026-09-29** (BOS@NYY and CHC@SD Wild Card games): 22 live clips
 arrived 32–57 s after the play (median 40 s), with no wrong clips found. Most of
 that delay is broadcast lag plus the footage kept after the play.
