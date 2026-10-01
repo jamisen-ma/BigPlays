@@ -53,6 +53,11 @@ Reddit game thread (RSS) ──► hype score ──► local LLM (qwen3:4b) ─
 arrived 32–57 s after the play (median 40 s), with no wrong clips found. Most of
 that delay is broadcast lag plus the footage kept after the play.
 
+<img width="1728" height="1023" alt="Screenshot 2026-09-30 at 6 15 57 PM" src="https://github.com/user-attachments/assets/2f6880d4-dce1-4afa-9522-f0cacaacabc0" />
+<img width="1722" height="1075" alt="Screenshot 2026-09-30 at 6 16 07 PM" src="https://github.com/user-attachments/assets/779d2395-b50f-4f63-9a87-f39adfc669b5" />
+<img width="1728" height="1117" alt="Screenshot 2026-09-30 at 6 16 15 PM" src="https://github.com/user-attachments/assets/47a1f58e-6dab-4d49-b1ca-2e51fbba0ea1" />
+<img width="1728" height="1117" alt="Screenshot 2026-09-30 at 6 16 21 PM" src="https://github.com/user-attachments/assets/f422b50c-2a36-4241-80a0-049fbfa585aa" />
+
 ## Apps
 
 - **Web app** (`frontend/`, React + Vite), served by the backend at
