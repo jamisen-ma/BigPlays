@@ -3,7 +3,6 @@ import os
 
 
 # Tests that exercise these modes enable them explicitly with monkeypatch.
-os.environ['DEMO_MODE'] = 'false'
 os.environ['MLB_HIGHLIGHTS_ENABLED'] = 'false'
 os.environ['REDDIT_RSS_ENABLED'] = 'false'
 os.environ['SOCIAL_CLIP_GATE'] = 'false'

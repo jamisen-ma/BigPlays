@@ -3,12 +3,11 @@ import { SOURCE_KINDS, type Highlight, type SourceKind } from './types'
 
 /**
  * Provenance of a clip. Prefer the backend's explicit `source_kind`; otherwise infer it:
- * demo-dataset records are replays, other imported records are official uploads, and anything
- * else was cut by our own pipeline from the continuous stream buffer.
+ * imported records are official uploads, and anything else was cut by our own pipeline from
+ * the continuous stream buffer.
  */
-export function sourceKindOf(h: { source_kind?: SourceKind | null; demo?: boolean; imported?: boolean }): SourceKind {
+export function sourceKindOf(h: { source_kind?: SourceKind | null; imported?: boolean }): SourceKind {
   if (h.source_kind && SOURCE_KINDS.includes(h.source_kind)) return h.source_kind
-  if (h.demo) return 'replay'
   if (h.imported) return 'official_upload'
   return 'live_capture'
 }
@@ -21,7 +20,7 @@ export function sourceLabel(kind: SourceKind, league?: string): string {
 
 export const SOURCE_DESCRIPTION: Record<SourceKind, string> = {
   live_capture: 'Cut from our own continuous live buffer',
-  replay: 'Replay from the demo dataset',
+  replay: 'Replay of archived footage',
   official_upload: 'Official highlight imported after publication',
 }
 

@@ -10,7 +10,7 @@ import { GamesTicker } from './components/GamesTicker'
 import { MLBGames } from './components/MLBGames'
 import { SocialFeed } from './components/SocialFeed'
 import { sourceKindOf, sourceLabel } from './components/util'
-import { SOURCE_KINDS, STAGES, STAGE_LABEL, type League, type SourceKind } from './types'
+import { SOURCE_KINDS, type League, type SourceKind } from './types'
 import { useNav } from './games/nav'
 import { NavTabs } from './games/NavTabs'
 import { ScoresView } from './games/ScoresView'
@@ -80,14 +80,12 @@ function ClipsApp({ nav }: { nav: ReactNode }) {
   }, [feed.highlights, filter])
   const arrivalKind = feed.lastArrival ? sourceKindOf(feed.lastArrival) : null
   const current = feed.highlights.find(h => h.event_id === selected) ?? null
-  const pending = feed.pipeline && !feed.pipeline.finished ? feed.pipeline : null
-  const pendingStage = pending ? STAGES.filter(s => pending.stages[s]).at(-1) : undefined
 
   return (
     <div className="app">
       <TopBar
         nav={nav}
-        connected={feed.connected} mode={feed.mode} highlights={feed.highlights} games={feed.games}
+        connected={feed.connected} highlights={feed.highlights} games={feed.games}
         filter={filter} setFilter={value => { setFilter(value); setGame('all'); setFollow(false) }} follow={follow} setFollow={setFollow}
       />
       <main className="layout">
@@ -112,16 +110,6 @@ function ClipsApp({ nav }: { nav: ReactNode }) {
             </select>
           </div>
           <div className="feed-list">
-            {pending && (
-              <div className="feed-item pending">
-                <div className="feed-thumb shimmer" />
-                <div className="feed-body">
-                  <div className="feed-title muted">Agent evaluating a play…</div>
-                  <div className="feed-meta"><span className="spinner" /> {pendingStage ? STAGE_LABEL[pendingStage] : 'ingest'}</div>
-                  <div className="stage-detail">{pendingStage ? pending.stages[pendingStage]?.detail : ''}</div>
-                </div>
-              </div>
-            )}
             {visible.map(h => (
               <FeedItem
                 key={h.event_id} h={h} now={now}
@@ -130,7 +118,7 @@ function ClipsApp({ nav }: { nav: ReactNode }) {
                 onClick={() => { setSelected(h.event_id); setFollow(false) }}
               />
             ))}
-            {!visible.length && !pending && <div className="feed-empty muted">{query || game !== 'all' || source !== 'all' ? 'No highlights match these filters.' : 'No plays yet. Listening…'}</div>}
+            {!visible.length && <div className="feed-empty muted">{query || game !== 'all' || source !== 'all' ? 'No highlights match these filters.' : 'No plays yet. Listening…'}</div>}
           </div>
         </aside>
 
@@ -140,14 +128,15 @@ function ClipsApp({ nav }: { nav: ReactNode }) {
             const highlight = feed.highlights.find(h => h.league === 'mlb' && h.game_id === id)
             if (highlight) setSelected(highlight.event_id)
           }} />
-          {feed.mode !== 'demo' && <><AgentMonitor /><LiveStream /></>}
+          <AgentMonitor />
+          <LiveStream />
           <Player h={current} />
           <SocialFeed league={filter === 'mlb' ? 'mlb' : filter === 'nfl' ? 'nfl' : current?.league === 'mlb' ? 'mlb' : 'nfl'}
             currentClipId={selected} clipTitle={id => feed.highlights.find(h => h.event_id === id)?.title}
             onSelectClip={id => { setSelected(id); setFollow(false) }} />
         </div>
 
-        <Pipeline pipeline={feed.pipeline} logs={feed.logs} mode={feed.mode} onFire={feed.fireNext} />
+        <Pipeline logs={feed.logs} />
       </main>
       <GamesTicker games={feed.games} />
 

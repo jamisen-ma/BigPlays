@@ -34,7 +34,7 @@ export function Player({ h }: { h: Highlight | null }) {
   const poster = h.poster ? `/clips/${h.poster}` : undefined
   const teamColor = h.team === h.home ? h.home_color : h.away_color
   const showFootage = !!h.youtube_id && !useLocal
-  const saved = h.demo || h.imported
+  const saved = h.imported
   const sourceName = h.source?.channel || h.league.toUpperCase()
   const kind = sourceKindOf(h)
 
@@ -61,7 +61,7 @@ export function Player({ h }: { h: Highlight | null }) {
           <div className="video-badges">
             <span className={`league-pill ${h.league}`}>{h.league.toUpperCase()}</span>
             <span className={`source-pill ${kind}`} data-source-kind={kind} title={SOURCE_DESCRIPTION[kind]}>{sourceLabel(kind, h.league)}</span>
-            <span className="live-pill"><i /> {saved ? showFootage || h.media_kind === 'broadcast' ? 'REPLAY' : 'REPLAY · ANIMATION' : 'AUTO-CLIPPED'}</span>
+            <span className="live-pill"><i /> {saved ? 'REPLAY' : 'AUTO-CLIPPED'}</span>
             <span className="cut-pill mono">{h.clip_duration != null ? `${h.clip_duration}s cut` : h.youtube_end != null ? `${h.youtube_end - (h.youtube_start ?? 0)}s cut` : '−8s / +6s'}</span>
           </div>
           {!showFootage && (
@@ -73,7 +73,7 @@ export function Player({ h }: { h: Highlight | null }) {
       </div>
 
       <div className="detail">
-        {saved && <p className="pbp">{h.season ? `${h.league.toUpperCase()} ${h.season}${h.week ? ` · Week ${h.week}` : ''} · ` : ''}{h.imported ? `Archived ${h.league.toUpperCase()} highlight · ${h.date}` : `Replay from ${h.date} · analysis and reactions are simulated.`}
+        {saved && <p className="pbp">{h.season ? `${h.league.toUpperCase()} ${h.season}${h.week ? ` · Week ${h.week}` : ''} · ` : ''}{`Archived ${h.league.toUpperCase()} highlight · ${h.date}`}
           {h.source?.url && <> <a href={h.source.url} target="_blank" rel="noreferrer">{h.source.channel || 'Watch source'}</a></>}
           {h.source?.play_by_play_url && <> · <a href={h.source.play_by_play_url} target="_blank" rel="noreferrer">{h.league === 'mlb' ? 'MLB play-by-play' : 'ESPN play-by-play'}</a></>}
         </p>}
@@ -121,7 +121,7 @@ export function Player({ h }: { h: Highlight | null }) {
 
         {!h.imported && <div className="detail-grid">
           <div className="card">
-            <div className="card-title"><span className="claude-dot" /> {h.demo ? 'Demo judgment' : 'Claude judgment'}</div>
+            <div className="card-title"><span className="claude-dot" /> Claude judgment</div>
             <p className="rationale">{h.llm?.rationale ?? 'Heuristics only (LLM disabled).'}</p>
             <div className="scores">
               <HypeBar value={h.base_score ?? 0} label="heuristic base" />
@@ -131,7 +131,7 @@ export function Player({ h }: { h: Highlight | null }) {
             </div>
           </div>
           <div className="card">
-            <div className="card-title">{h.demo ? 'Scripted replay context' : 'Retrieved context (RAG)'}</div>
+            <div className="card-title">Retrieved context (RAG)</div>
             <ul className="quotes">
               {(h.commentary ?? []).map((c, i) => <li key={i}><span className="q-src">PBP</span>{c}</li>)}
               {(h.social ?? []).map((c, i) => <li key={`s${i}`}><span className="q-src social">SOC</span>{c}</li>)}

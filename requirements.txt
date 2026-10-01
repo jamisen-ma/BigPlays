@@ -1,24 +1,15 @@
-anthropic>=0.30.0
-boto3>=1.34.0
 fastapi>=0.110.0
 httpx>=0.27.0
-langchain>=0.2.7
-langchain-anthropic>=0.1.20
 python-dotenv>=1.0.1
 pydantic>=2.7.0
 pydantic-settings>=2.2.1
 requests>=2.32.0
 structlog>=24.1.0
-tenacity>=8.3.0
 typer>=0.12.3
 uvicorn>=0.29.0
-aiofiles>=23.2.1
-aiohttp>=3.9.5
-Jinja2>=3.1.4
 pytest>=8.2.0
 orjson>=3.10.6
 beautifulsoup4>=4.12.3
 
 pillow>=10.0.0
 imageio-ffmpeg>=0.5.1
-yt-dlp>=2026.8.19

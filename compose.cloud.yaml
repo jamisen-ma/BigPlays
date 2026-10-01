@@ -17,14 +17,12 @@ x-runtime: &runtime
     target: runtime
   env_file: cloud.env
   environment:
-    DEMO_MODE: 'false'
     RESOLVER_BASE_URL: http://resolver:3000
     OLLAMA_BASE_URL: http://ollama:11434
     SCOREBOARD_OCR_BIN: tesseract
     AGENT_DIR: /data/agent
     CLIPS_DIR: /data/clips
     BUFFER_DIR: /data/buffer
-    DEMO_CLIPS_DIR: /data/demo_clips
   volumes:
     - footage:/data
   depends_on:

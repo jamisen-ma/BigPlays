@@ -590,7 +590,7 @@ async def main():
     try:
         while not stopping.is_set():
             enabled = load_json(settings.agent_dir / 'control.json', {'enabled': True}).get('enabled', True)
-            if enabled and not settings.demo_mode and time.time() - last_discovery >= 60:
+            if enabled and time.time() - last_discovery >= 60:
                 try:
                     report = await discover()
                     # MLB uses the official highlight collector until its video alignment
@@ -625,7 +625,7 @@ async def main():
                     task.cancel()
                     await asyncio.gather(task, return_exceptions=True)
                     del sessions[key]
-            if enabled and not settings.demo_mode:
+            if enabled:
                 for game in available:
                     key = f"{game['league']}:{game['game_id']}"
                     if key not in sessions and len(sessions) < settings.agent_max_games:

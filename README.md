@@ -210,7 +210,7 @@ All settings are environment variables; see `env.example`. The main ones:
 ## Tests
 
 ```bash
-.venv-local/bin/python -m pytest -q          # backend (302 tests)
+.venv-local/bin/python -m pytest -q          # backend
 npm run build --prefix frontend
 node frontend/tests/games.mjs                # scoreboard + play-by-play (mocked API)
 node frontend/tests/video-frame.mjs          # clip frame sizing + autoplay

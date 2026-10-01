@@ -36,7 +36,7 @@ export interface Highlight extends BaseballState {
   week?: number | null
   source_play_id?: string | null
   replay_dataset?: string
-  media_kind?: 'animation' | 'broadcast'
+  media_kind?: 'broadcast'
   video_start?: number
   video_end?: number | null
   clip_duration?: number | null
@@ -74,7 +74,6 @@ export interface Highlight extends BaseballState {
   youtube_start?: number
   youtube_end?: number | null
   source?: { title?: string; channel?: string; url?: string | null; play_by_play_url?: string | null }
-  demo?: boolean
   ts?: number
 }
 
@@ -98,31 +97,10 @@ export interface Game extends BaseballState {
   series_description?: string
 }
 
-export type Stage = 'ingest' | 'retrieve' | 'heuristic' | 'social' | 'llm' | 'clip' | 'store'
-export const STAGES: Stage[] = ['ingest', 'retrieve', 'heuristic', 'social', 'llm', 'clip', 'store']
-export const STAGE_LABEL: Record<Stage, string> = {
-  ingest: 'Ingest',
-  retrieve: 'RAG retrieve',
-  heuristic: 'Heuristics',
-  social: 'Social signal',
-  llm: 'Claude judgment',
-  clip: 'FFmpeg clip',
-  store: 'S3 + tag',
-}
-
-export interface PipelineEvent {
-  play_id: string
-  stage: Stage
-  status: 'running' | 'done'
-  detail: string
-  data?: Record<string, unknown>
-  ts: number
-}
-
 export interface LogLine {
   id: number
   ts: number
-  level: 'info' | 'warn' | 'error' | 'stage' | 'highlight'
+  level: 'info' | 'warn' | 'error' | 'highlight'
   msg: string
 }
 
