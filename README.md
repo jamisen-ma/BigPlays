@@ -124,11 +124,24 @@ Requirements: Python 3.12+ and Node 20+. You also need [Ollama](https://ollama.c
 with `ollama pull qwen3:4b` for the hype gate, and macOS for the scorebug OCR
 (`scripts/scoreboard_ocr.swift`). ffmpeg ships with `imageio-ffmpeg`.
 
+The quickest way is the start script. It sets up `.venv-local`, rebuilds the web app
+from the current source, and starts everything:
+
+```bash
+scripts/dev.sh                  # API + web app → http://127.0.0.1:8000
+scripts/dev.sh --agent --expo   # plus live capture and the Expo app on :8082
+```
+
+By hand:
+
 ```bash
 python3 -m venv .venv-local && .venv-local/bin/pip install -r requirements.txt
 cp env.example .env
-npm install --prefix frontend && npm run build --prefix frontend
+npm ci --prefix frontend && npm run build --prefix frontend   # rerun after every pull
 ```
+
+`server run` also rebuilds `frontend/dist` automatically when the source is newer
+than the build, so a pulled checkout never serves an old UI.
 
 Start the services, each in its own terminal (or all together with `process-compose up`):
 

@@ -337,6 +337,10 @@ def server_run(
                        and (settings.clips_dir / record['file']).is_file()
                        for record in catalog.all(settings.demo_dataset)):
                 raise typer.BadParameter('Import Week 3 footage first: python -m bigplays.ingest.week3_archive')
+    from bigplays.server.frontend_build import ensure_frontend_built
+    ensure_frontend_built()
+    if settings.demo_mode:
+        typer.echo('DEMO_MODE is on: the feed replays archived plays. Set DEMO_MODE=false in .env for live mode.')
     h = host or settings.server_host
     p = port or settings.server_port
     # short graceful-shutdown window so open SSE streams don't keep a dying server alive
