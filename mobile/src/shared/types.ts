@@ -2,8 +2,8 @@
 // Pure TS: no React / React Native imports, so it's unit-testable and shareable.
 
 /** Where a clip's video came from. See sourceKindOf() for the fallback when the backend omits it. */
-export type SourceKind = 'live_capture' | 'replay' | 'official_upload'
-export const SOURCE_KINDS: SourceKind[] = ['live_capture', 'replay', 'official_upload']
+export type SourceKind = 'live_capture' | 'official_upload'
+export const SOURCE_KINDS: SourceKind[] = ['live_capture', 'official_upload']
 
 export type GamesLeague = 'nfl' | 'mlb'
 export const GAMES_LEAGUES: GamesLeague[] = ['nfl', 'mlb']

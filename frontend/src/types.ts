@@ -18,8 +18,8 @@ export interface LLMJudgment {
 }
 
 /** Where a clip's video came from. Backend should emit this; see sourceKindOf() for the fallback. */
-export type SourceKind = 'live_capture' | 'replay' | 'official_upload'
-export const SOURCE_KINDS: SourceKind[] = ['live_capture', 'replay', 'official_upload']
+export type SourceKind = 'live_capture' | 'official_upload'
+export const SOURCE_KINDS: SourceKind[] = ['live_capture', 'official_upload']
 
 export interface Highlight extends BaseballState {
   event_id: string

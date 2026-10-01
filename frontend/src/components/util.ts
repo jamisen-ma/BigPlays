@@ -74,14 +74,11 @@ export function sourceKindOf(h: Pick<Highlight, 'source_kind' | 'imported'>): So
   return 'live_capture'
 }
 
-export function sourceLabel(kind: SourceKind, league?: string): string {
-  if (kind === 'live_capture') return 'LIVE CAPTURE'
-  if (kind === 'official_upload') return 'OFFICIAL UPLOAD'
-  return league && league !== 'unknown' ? `${league.toUpperCase()} REPLAY` : 'REPLAY'
+export function sourceLabel(kind: SourceKind, _league?: string): string {
+  return kind === 'live_capture' ? 'LIVE CAPTURE' : 'OFFICIAL UPLOAD'
 }
 
 export const SOURCE_DESCRIPTION: Record<SourceKind, string> = {
   live_capture: 'Cut from our own continuous live buffer',
-  replay: 'Replay of archived footage',
   official_upload: 'Official highlight imported after publication',
 }

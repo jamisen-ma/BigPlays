@@ -57,7 +57,7 @@ Leagues: `nfl`, `mlb`. All times are ISO-8601 UTC with a `Z` suffix. Unknown val
 ### ClipRef
 ```json
 { "event_id", "title", "video_url", "poster_url", "duration_seconds",
-  "source_kind": "live_capture" | "replay" | "official_upload",
+  "source_kind": "live_capture" | "official_upload",
   "social_score": 0.0 | null, "occurred_utc", "published_utc" }
 ```
 `video_url` and `poster_url` are URLs the browser can load directly (the same scheme `/api/highlights` uses today).

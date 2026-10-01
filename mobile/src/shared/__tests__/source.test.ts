@@ -17,8 +17,7 @@ describe('sourceKindOf / sourceLabel', () => {
   it('labels', () => {
     expect(sourceLabel('live_capture')).toBe('LIVE CAPTURE')
     expect(sourceLabel('official_upload', 'mlb')).toBe('OFFICIAL UPLOAD')
-    expect(sourceLabel('replay', 'nfl')).toBe('NFL REPLAY')
-    expect(sourceLabel('replay', 'unknown')).toBe('REPLAY')
+    expect(sourceKindOf({ source_kind: 'replay' as never, imported: true })).toBe('official_upload')
   })
 })
 

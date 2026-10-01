@@ -74,7 +74,7 @@ function ClipsApp({ nav }: { nav: ReactNode }) {
     [feed.highlights, filter, game, query, ranked, source],
   )
   const sourceCounts = useMemo(() => {
-    const counts: Record<SourceKind, number> = { live_capture: 0, replay: 0, official_upload: 0 }
+    const counts: Record<SourceKind, number> = { live_capture: 0, official_upload: 0 }
     for (const h of feed.highlights) if (filter === 'all' || h.league === filter) counts[sourceKindOf(h)]++
     return counts
   }, [feed.highlights, filter])
@@ -105,7 +105,7 @@ function ClipsApp({ nav }: { nav: ReactNode }) {
             <select aria-label="Filter by source" value={source} onChange={e => { setSource(e.target.value as 'all' | SourceKind); setFollow(false) }}>
               <option value="all">All sources</option>
               {SOURCE_KINDS.map(kind => <option key={kind} value={kind}>
-                {sourceLabel(kind, kind === 'replay' && filter !== 'all' ? filter : undefined)} ({sourceCounts[kind]})
+                {sourceLabel(kind)} ({sourceCounts[kind]})
               </option>)}
             </select>
           </div>

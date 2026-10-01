@@ -25,8 +25,8 @@ from zoneinfo import ZoneInfo
 
 from bigplays.config import settings
 
-SOURCE_KINDS = ('live_capture', 'replay', 'official_upload')
-KIND_RANK = {'live_capture': 2, 'official_upload': 1, 'replay': 0}
+SOURCE_KINDS = ('live_capture', 'official_upload')
+KIND_RANK = {'live_capture': 2, 'official_upload': 1}
 
 # ESPN abbreviation -> MLB Stats API abbreviation, where they differ.
 MLB_ABBR = {'CHW': 'CWS', 'ARI': 'AZ', 'OAK': 'ATH', 'WSN': 'WSH', 'KCR': 'KC', 'SDP': 'SD',
@@ -268,8 +268,7 @@ def _rank(clip: dict):
 
 
 def viral_reason(clip: dict) -> str:
-    reason = {'live_capture': 'Live capture', 'official_upload': 'Official highlight',
-              'replay': 'Replay clip'}.get(clip.get('source_kind'), 'Clip')
+    reason = {'live_capture': 'Live capture', 'official_upload': 'Official highlight'}.get(clip.get('source_kind'), 'Clip')
     if clip.get('social_score') is not None:
         reason += f" · fan buzz {clip['social_score']:.2f}"
     return reason
