@@ -1,6 +1,6 @@
 # BigPlays
 
-An ESPN-style scoreboard and play-by-play for live NFL and MLB games, with video
+An ESPN-style scoreboard and play-by-play for live NFL, CFB, NBA and MLB games, with video
 clips attached to the plays people are actually going crazy about.
 
 BigPlays records live broadcasts into a rolling buffer, follows ESPN's
