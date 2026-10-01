@@ -27,7 +27,6 @@ export const C = {
 export const SOURCE_COLORS = {
   live_capture: { fg: '#ff8a8f', bg: 'rgba(255,59,71,0.14)', border: 'rgba(255,59,71,0.5)' },
   official_upload: { fg: '#7fb8ff', bg: 'rgba(96,165,250,0.14)', border: 'rgba(96,165,250,0.5)' },
-  replay: { fg: '#c4b5fd', bg: 'rgba(167,139,250,0.14)', border: 'rgba(167,139,250,0.5)' },
 } as const
 
 export const F = {

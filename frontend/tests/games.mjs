@@ -93,7 +93,7 @@ const judgeClip = clipRef({ event_id: 'clip-judge-hr', title: 'Aaron Judge 3-run
   poster_url: '/clips/judge-poster.svg', occurred_utc: '2026-09-30T01:12:40Z' })
 const judgeOfficial = clipRef({ event_id: 'clip-judge-hr-mlb', title: 'Judge crushes a 3-run homer', source_kind: 'official_upload',
   duration_seconds: 38, published_utc: '2026-09-30T01:30:00Z' })
-const casasClip = clipRef({ event_id: 'clip-casas-hr', title: 'Triston Casas 2-run HR', source_kind: 'replay', duration_seconds: 21 })
+const casasClip = clipRef({ event_id: 'clip-casas-hr', title: 'Triston Casas 2-run HR', source_kind: 'official_upload', duration_seconds: 21 })
 
 const mlbPlay = (seq, period_label, text, away_score, home_score, over = {}) => ({
   play_id: `401907924${String(seq).padStart(3, '0')}`, sequence: seq, period: Number(period_label.split(' ')[1]), period_label,
@@ -358,7 +358,7 @@ try {
   await page.locator(`.play-row.is-new[data-play-id="${pid(9)}"]`).waitFor({ timeout: 5000 })
   await page.locator(`[data-play-id="${pid(5)}"] .new-clip-flash`).filter({ hasText: 'NEW CLIP' }).waitFor({ timeout: 5000 })
   assert.equal((await rowIds(page))[0], pid(9), 'new play appears at the top')
-  assert.equal(await page.locator(`[data-play-id="${pid(5)}"] .source-pill`).textContent(), 'MLB REPLAY')
+  assert.equal(await page.locator(`[data-play-id="${pid(5)}"] .source-pill`).textContent(), 'OFFICIAL UPLOAD')
   await page.waitForTimeout(200)
   const after = await page.locator(`[data-play-id="${pid(4)}"]`).evaluate(el => el.getBoundingClientRect().top)
   assert.ok(Math.abs(after - before) < 3, `scroll position kept (row moved ${before} -> ${after})`)

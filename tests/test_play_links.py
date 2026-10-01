@@ -54,7 +54,7 @@ def test_unmatched_never_time_matched(tmp_path):
 def test_multi_clip_selection_prefers_live_then_social_then_latest(tmp_path):
     plays = [play('P01'), play('P02'), play('P03')]
     clips = [
-        clip('replay_hi', source_play_id='P01', source_kind='replay', social_score=0.99),
+        clip('official_top', source_play_id='P01', imported=True, social_score=0.99),
         clip('live', source_play_id='P01'),
         clip('official_lo', source_play_id='P02', imported=True, social_score=0.2),
         clip('official_hi', source_play_id='P02', imported=True, social_score=0.8),
@@ -63,7 +63,7 @@ def test_multi_clip_selection_prefers_live_then_social_then_latest(tmp_path):
     ]
     out, _ = attach(plays, clips)
     assert out[0]['clip']['event_id'] == 'live' and out[0]['clip']['source_kind'] == 'live_capture'
-    assert [c['event_id'] for c in out[0]['alternate_clips']] == ['replay_hi']
+    assert [c['event_id'] for c in out[0]['alternate_clips']] == ['official_top']
     assert out[1]['clip']['event_id'] == 'official_hi'
     assert out[1]['viral_reason'] == 'Official highlight · fan buzz 0.80'
     assert out[2]['clip']['event_id'] == 'new'
